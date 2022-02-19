@@ -9,7 +9,7 @@ impl TestServer {
         let defaults = &[
             ("http_server.host", "127.0.0.1"),
             ("http_server.port", "0"),
-            ("static_files.directory", "../../dist"),
+            ("static_files.directory", "../../dist/"),
         ];
 
         let (server, port, _configuration) = startup::run(&[defaults, overrides].concat());

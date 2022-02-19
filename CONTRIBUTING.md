@@ -46,7 +46,7 @@ cargo build --release --bin chamber-api
 ### Build [Chamber App][2]
 
 ```bash
-trunk build --release -- packages/chamber-app/index.html
+trunk build --dist ./dist --release -- packages/chamber-app/index.html
 ```
 
 

@@ -2,6 +2,8 @@
     "cSpell.words": [
         "actix",
         "alloc",
+        "appgroup",
+        "appuser",
         "bindgen",
         "clippy",
         "codecov",
