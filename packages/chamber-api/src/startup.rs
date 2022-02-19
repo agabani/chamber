@@ -1,5 +1,7 @@
+use std::sync::Arc;
+
 use crate::configuration::Configuration;
-use crate::routes::health;
+use crate::routes::{health, static_files};
 use crate::tracing::TraceErrorExt;
 use actix_web::dev::Server;
 use actix_web::{web, App, HttpServer};
@@ -24,9 +26,13 @@ pub fn run(overrides: &[(&str, &str)]) -> (Server, u16, Configuration) {
         .expect("Failed to bind port");
     let port = listener.local_addr().unwrap().port();
 
+    let arc_configuration = Arc::new(configuration.clone());
+
     // configure server
     let server = HttpServer::new(move || {
-        App::new().service(web::scope("/health").configure(health::config))
+        App::new()
+            .service(web::scope("/health").configure(health::config))
+            .service(web::scope("").configure(|cfg| static_files::config(cfg, &arc_configuration)))
     })
     .listen(listener)
     .trace_err()

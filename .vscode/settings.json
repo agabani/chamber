@@ -1,11 +1,14 @@
 {
     "cSpell.words": [
+        "actix",
         "alloc",
         "bindgen",
         "clippy",
         "codecov",
         "codegen",
+        "etag",
         "onclick",
+        "reqwest",
         "RUSTDOCFLAGS",
         "RUSTFLAGS",
         "rustfmt",

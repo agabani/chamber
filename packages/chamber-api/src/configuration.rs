@@ -1,9 +1,10 @@
 use config::{Config, ConfigError, Environment};
 use std::net::TcpListener;
 
-#[derive(serde::Deserialize)]
+#[derive(Clone, serde::Deserialize)]
 pub struct Configuration {
     pub http_server: HttpServer,
+    pub static_files: StaticFiles,
 }
 
 impl Configuration {
@@ -11,6 +12,7 @@ impl Configuration {
         let mut config_builder = Config::builder()
             .set_default("http_server.host", "127.0.0.1")?
             .set_default("http_server.port", "8080")?
+            .set_default("static_files.directory", "./dist")?
             .add_source(Environment::with_prefix("APP_").separator("__"));
 
         for &(key, value) in overrides {
@@ -21,7 +23,7 @@ impl Configuration {
     }
 }
 
-#[derive(serde::Deserialize)]
+#[derive(Clone, serde::Deserialize)]
 pub struct HttpServer {
     pub host: String,
     pub port: u16,
@@ -31,4 +33,9 @@ impl HttpServer {
     pub fn tcp_listener(&self) -> std::io::Result<TcpListener> {
         TcpListener::bind(format!("{}:{}", self.host, self.port))
     }
+}
+
+#[derive(Clone, serde::Deserialize)]
+pub struct StaticFiles {
+    pub directory: String,
 }
