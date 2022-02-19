@@ -1,0 +1,14 @@
+[package]
+name = "chamber-app"
+version = "0.1.0"
+edition = "2021"
+
+[profile.release]
+panic = 'abort'
+codegen-units = 1
+opt-level = 'z'
+lto = true
+
+[dependencies]
+wee_alloc = "0.4.5"
+yew = "0.19.3"

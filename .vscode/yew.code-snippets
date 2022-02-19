@@ -1,0 +1,29 @@
+{
+    "Create new Yew Component": {
+        "scope": "rust",
+        "prefix": "yew component",
+        "body": [
+            "use yew::prelude::*;",
+            "",
+            "pub enum Msg{}",
+            "",
+            "pub struct ${1};",
+            "",
+            "impl Component for ${1} {",
+            "    type Message = Msg;",
+            "    type Properties = ();",
+            "",
+            "    fn create(ctx: &Context<Self>) -> Self {",
+            "        Self",
+            "    }",
+            "",
+            "    fn view(&self, ctx: &Context<Self>) -> Html {",
+            "        html! {",
+            "            ${0}",
+            "        }",
+            "    }",
+            "}"
+        ],
+        "description": "Creates a new Yew component without properties but with a message enum"
+    }
+}
