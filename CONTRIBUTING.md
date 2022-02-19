@@ -39,6 +39,7 @@ trunk serve -- packages/chamber-app/index.html
 ### Build [Chamber API][1]
 
 ```shell
+trunk watch --dist ./dist -- packages/chamber-app/index.html
 cargo build --release --bin chamber-api
 ```
 
