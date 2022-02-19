@@ -22,7 +22,13 @@ cargo install --locked wasm-bindgen-cli
 
 ## Running your local development environment
 
-### Run [Chamber App][1]
+### Run [Chamber API][1]
+
+```bash
+cargo run --bin chamber-api
+```
+
+### Run [Chamber App][2]
 
 ```bash
 trunk serve -- packages/chamber-app/index.html
@@ -30,11 +36,18 @@ trunk serve -- packages/chamber-app/index.html
 
 ## Building for production environment
 
-### Build [Chamber App][1]
+### Build [Chamber API][1]
+
+```shell
+cargo build --release --bin chamber-api
+```
+
+### Build [Chamber App][2]
 
 ```bash
 trunk build --release -- packages/chamber-app/index.html
 ```
 
 
-[1]: </packages/chamber-app/>
+[1]: </packages/chamber-api/>
+[2]: </packages/chamber-app/>
