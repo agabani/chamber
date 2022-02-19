@@ -12,8 +12,8 @@ impl Configuration {
         let mut config_builder = Config::builder()
             .set_default("http_server.host", "127.0.0.1")?
             .set_default("http_server.port", "8080")?
-            .set_default("static_files.directory", "./dist")?
-            .add_source(Environment::with_prefix("APP_").separator("__"));
+            .set_default("static_files.directory", "dist/")?
+            .add_source(Environment::with_prefix("CHAMBER_API").separator("__"));
 
         for &(key, value) in overrides {
             config_builder = config_builder.set_override(key, value)?;
