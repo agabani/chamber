@@ -8,5 +8,6 @@ target/
 .editorconfig
 .gitattributes
 .gitignore
+.heroku
 *.md
 Dockerfile
