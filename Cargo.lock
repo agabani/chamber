@@ -434,6 +434,7 @@ dependencies = [
  "actix-files",
  "actix-rt",
  "actix-web",
+ "chamber-api-contract",
  "config",
  "reqwest",
  "serde",
@@ -445,9 +446,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "chamber-api-contract"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "chamber-app"
 version = "0.1.0"
 dependencies = [
+ "chamber-api-contract",
+ "reqwasm",
+ "wasm-bindgen-futures",
  "wee_alloc",
  "yew",
 ]
@@ -1533,6 +1544,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3acd125665422973a33ac9d3dd2df85edad0f4ae9b00dafb1a05e43a9f5ef8e7"
 dependencies = [
  "winapi",
+]
+
+[[package]]
+name = "reqwasm"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ee625fb8e28ee1dac344e1d135c3b9815ddd5b44b3062cb69fe83168e5225a10"
+dependencies = [
+ "futures-channel",
+ "futures-core",
+ "futures-sink",
+ "gloo-utils",
+ "js-sys",
+ "pin-project",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
 ]
 
 [[package]]

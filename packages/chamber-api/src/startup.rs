@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::configuration::Configuration;
-use crate::routes::{health, static_files};
+use crate::routes::{api, health, static_files};
 use crate::tracing::TraceErrorExt;
 use actix_web::dev::Server;
 use actix_web::{web, App, HttpServer};
@@ -32,6 +32,7 @@ pub fn run(overrides: &[(&str, &str)]) -> (Server, u16, Configuration) {
     let server = HttpServer::new(move || {
         App::new()
             .service(web::scope("/health").configure(health::config))
+            .service(web::scope("/api").configure(api::config))
             .service(web::scope("").configure(|cfg| static_files::config(cfg, &arc_configuration)))
     })
     .listen(listener)

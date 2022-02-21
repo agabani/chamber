@@ -10,5 +10,8 @@ opt-level = 'z'
 lto = true
 
 [dependencies]
+chamber-api-contract = { path = "../chamber-api-contract" }
+reqwasm = "0.4.1"
+wasm-bindgen-futures = "0.4.29"
 wee_alloc = "0.4.5"
 yew = "0.19.3"

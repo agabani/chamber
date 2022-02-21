@@ -1,10 +1,13 @@
+mod api;
 mod components;
 
 use yew::prelude::*;
 
+use api::v1::add_one;
 use components::button::Button;
 
 pub enum Msg {
+    SetValue(i64),
     AddOne,
 }
 
@@ -20,20 +23,30 @@ impl Component for Model {
         Self { value: 0 }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::AddOne => {
-                self.value += 1;
+                let number = self.value;
+                let link = ctx.link().clone();
+
+                wasm_bindgen_futures::spawn_local(async move {
+                    let result = add_one(number).await;
+                    link.send_message(Msg::SetValue(result.data));
+                });
+
+                false
+            }
+            Msg::SetValue(i) => {
+                self.value = i;
                 true
             }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let link = ctx.link();
         html! {
             <div>
-                <Button text={ "+1" } onclick={link.callback(|_| Msg::AddOne)} />
+                <Button text={ "+1" } onclick={ctx.link().callback(|_| Msg::AddOne)} />
                 <p>{ self.value }</p>
             </div>
         }
