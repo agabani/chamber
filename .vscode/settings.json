@@ -12,6 +12,7 @@
         "onclick",
         "reqwasm",
         "reqwest",
+        "routable",
         "RUSTDOCFLAGS",
         "RUSTFLAGS",
         "rustfmt",
