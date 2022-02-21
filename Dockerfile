@@ -20,6 +20,7 @@ COPY .docker/main.rs packages/chamber-api/src/main.rs
 
 COPY packages/chamber-app/Cargo.toml packages/chamber-app/Cargo.toml
 COPY packages/chamber-app/index.html packages/chamber-app/index.html
+COPY .docker/index.scss packages/chamber-app/scss/index.scss
 COPY .docker/main.rs packages/chamber-app/src/main.rs
 
 COPY Cargo.lock Cargo.lock
