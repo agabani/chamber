@@ -6,5 +6,5 @@ extern crate wee_alloc;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 fn main() {
-    yew::start_app::<chamber_app::Model>();
+    yew::start_app::<chamber_app::App>();
 }
