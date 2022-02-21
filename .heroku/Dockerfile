@@ -18,6 +18,9 @@ COPY .docker/lib.rs packages/chamber/src/lib.rs
 COPY packages/chamber-api/Cargo.toml packages/chamber-api/Cargo.toml
 COPY .docker/main.rs packages/chamber-api/src/main.rs
 
+COPY packages/chamber-api-contract/Cargo.toml packages/chamber-api-contract/Cargo.toml
+COPY .docker/lib.rs packages/chamber-api-contract/src/lib.rs
+
 COPY packages/chamber-app/Cargo.toml packages/chamber-app/Cargo.toml
 COPY packages/chamber-app/index.html packages/chamber-app/index.html
 COPY .docker/index.scss packages/chamber-app/scss/index.scss
@@ -29,7 +32,7 @@ COPY Cargo.toml Cargo.toml
 RUN cargo build --target x86_64-unknown-linux-musl --release && \
     trunk build --dist ./dist --release -- packages/chamber-app/index.html && \
     rm -rf dist/ packages/ target/wasm-bindgen/ && \
-    find ./target/ -regex ".*chamber-app.*" -delete
+    find ./target/ -regex ".*chamber.*" -delete
 
 # 1c: Build the application using the real source code
 COPY packages/ packages/

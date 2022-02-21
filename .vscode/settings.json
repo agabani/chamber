@@ -10,6 +10,7 @@
         "codegen",
         "etag",
         "onclick",
+        "reqwasm",
         "reqwest",
         "RUSTDOCFLAGS",
         "RUSTFLAGS",
