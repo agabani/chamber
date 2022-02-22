@@ -1,11 +1,14 @@
 use yew_router::prelude::*;
 
 use crate::pages::home::HomePage;
+use crate::storybook::Storybook;
 
 #[derive(Clone, PartialEq, Routable)]
 pub enum Route {
     #[at("/")]
     Home,
+    #[at("/storybook/:s")]
+    Storybook,
     #[not_found]
     #[at("/404")]
     NotFound,
@@ -31,6 +34,7 @@ impl Component for Router {
                 <Switch<Route> render={Switch::render(|route| {
                     match route {
                         Route::Home => html! { <HomePage /> },
+                        Route::Storybook => html! { <Storybook /> },
                         Route::NotFound => html! { <h1>{ "404" }</h1> },
                     }
                 }
