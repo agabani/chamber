@@ -1,11 +1,14 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
 mod button;
+mod text_field;
 
 #[derive(Clone, PartialEq, Routable)]
 pub enum StorybookRoute {
     #[at("/storybook/button")]
     Button,
+    #[at("/storybook/text_field")]
+    TextField,
 }
 
 pub enum Msg {}
@@ -28,6 +31,7 @@ impl Component for Storybook {
                     Switch::render(|route| {
                         match route {
                             StorybookRoute::Button => html! { <button::Storybook /> },
+                            StorybookRoute::TextField => html! { <text_field::Storybook /> },
                         }
                     })
                 }/>

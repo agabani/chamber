@@ -1,12 +1,12 @@
-use yew::prelude::*;
 use crate::components::button::Button;
+use yew::prelude::*;
 
-pub enum Msg{
-    Event
+pub enum Msg {
+    Event,
 }
 
 pub struct Storybook {
-    event_clicked: i64
+    event_clicked: i64,
 }
 
 impl Component for Storybook {
@@ -22,7 +22,7 @@ impl Component for Storybook {
             Msg::Event => {
                 self.event_clicked += 1;
                 true
-            },
+            }
         }
     }
 

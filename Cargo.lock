@@ -459,6 +459,7 @@ dependencies = [
  "chamber-api-contract",
  "reqwasm",
  "wasm-bindgen-futures",
+ "web-sys",
  "wee_alloc",
  "yew",
  "yew-router",
