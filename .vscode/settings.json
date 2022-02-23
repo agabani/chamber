@@ -9,6 +9,7 @@
         "codecov",
         "codegen",
         "etag",
+        "onchange",
         "onclick",
         "reqwasm",
         "reqwest",
