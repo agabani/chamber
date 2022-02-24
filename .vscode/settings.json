@@ -11,6 +11,7 @@
         "etag",
         "onchange",
         "onclick",
+        "oninput",
         "reqwasm",
         "reqwest",
         "routable",

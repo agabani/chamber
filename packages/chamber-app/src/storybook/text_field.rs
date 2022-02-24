@@ -1,12 +1,14 @@
-use crate::components::text_field::{TextField, TextFieldEvent};
+use crate::components::text_field::TextField;
 use yew::prelude::*;
 
 pub enum Msg {
-    InputMessage(String),
+    Onchange(String),
+    Oninput(String),
 }
 
 pub struct Storybook {
-    event: String,
+    onchange: String,
+    oninput: String,
 }
 
 impl Component for Storybook {
@@ -15,34 +17,38 @@ impl Component for Storybook {
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            event: String::new(),
+            onchange: String::new(),
+            oninput: String::new(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::InputMessage(value) => {
-                self.event = value;
+            Msg::Onchange(value) => {
+                self.onchange = value;
+                true
+            }
+            Msg::Oninput(value) => {
+                self.oninput = value;
                 true
             }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let link = ctx.link();
         html! {
             <>
                 <h2>{ "Default"} </h2>
                 <TextField />
 
-                <h2>{ "Event"} </h2>
-                <TextField event={
-                    ctx.link().callback(|event| {
-                        match event {
-                            TextFieldEvent::OnChange(value) => Msg::InputMessage(value),
-                        }
-                    })
-                }/>
-                <div>{ "user typed " }{ &self.event }</div>
+                <h2>{ "On Change"} </h2>
+                <TextField onchange={link.callback(Msg::Onchange)}/>
+                <div>{ "user typed " }{ &self.onchange }</div>
+
+                <h2>{ "On Input"} </h2>
+                <TextField oninput={link.callback(Msg::Oninput)}/>
+                <div>{ "user typed " }{ &self.oninput }</div>
             </>
         }
     }
