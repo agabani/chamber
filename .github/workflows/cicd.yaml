@@ -225,8 +225,6 @@ jobs:
   docker:
     name: Docker
     runs-on: ubuntu-latest
-    needs:
-      - cargo-build
     permissions:
       contents: read
       packages: write
