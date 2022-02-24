@@ -5,9 +5,9 @@
         "body": [
             "use yew::prelude::*;",
             "",
-            "pub enum Msg{}",
-            "",
             "pub struct ${1};",
+            "",
+            "pub enum Msg{}",
             "",
             "impl Component for ${1} {",
             "    type Message = Msg;",
