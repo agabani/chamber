@@ -1,5 +1,5 @@
 # 1: Build
-FROM rust:1.58.1 as builder
+FROM rust:1.59.0 as builder
 
 # 1a: Prepare toolchain
 RUN apt update && \
