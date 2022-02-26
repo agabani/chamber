@@ -42,8 +42,11 @@ impl Component for Storybook {
                 <h2>{ "Default"} </h2>
                 <TextField />
 
+                <h2>{ "Value"} </h2>
+                <TextField value={ "Value" } />
+
                 <h2>{ "On Change"} </h2>
-                <TextField onchange={link.callback(Msg::Onchange)}/>
+                <TextField onchange={link.callback(Msg::Onchange)} />
                 <div>{ "user typed " }{ &self.onchange }</div>
 
                 <h2>{ "On Input"} </h2>

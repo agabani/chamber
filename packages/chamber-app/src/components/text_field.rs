@@ -1,7 +1,9 @@
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
-pub struct TextField;
+pub struct TextField {
+    initial_value: Option<String>,
+}
 
 pub enum Msg {
     OnChange(String),
@@ -10,6 +12,7 @@ pub enum Msg {
 
 #[derive(PartialEq, Properties)]
 pub struct Props {
+    pub value: Option<String>,
     pub onchange: Option<Callback<String>>,
     pub oninput: Option<Callback<String>>,
 }
@@ -18,8 +21,18 @@ impl Component for TextField {
     type Message = Msg;
     type Properties = Props;
 
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self
+    fn create(ctx: &Context<Self>) -> Self {
+        let props = ctx.props();
+
+        let initial_value = props.value.clone();
+
+        Self { initial_value }
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        let props = ctx.props();
+
+        self.initial_value != props.value
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -63,6 +76,7 @@ impl Component for TextField {
             <input
                 type="text"
                 class={classes!("chamber--text-field")}
+                value={self.initial_value.clone()}
                 onchange={onchange}
                 oninput={oninput}
             />
