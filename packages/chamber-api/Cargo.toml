@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-actix-files = "0.6.0-beta.16"
-actix-web = "4.0.0-rc.3"
+actix-files = "0.6.0"
+actix-web = "4.0.1"
 chamber-api-contract = { path = "../chamber-api-contract" }
 config = "0.12.0"
 serde = { version = "1.0.136", features = ["derive"] }
