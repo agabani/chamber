@@ -1,0 +1,11 @@
+nav:
+  - Chamber: index.md
+  - Development:
+    - Getting Started: development/getting_started.md
+plugins:
+  - include-markdown
+repo_url: https://github.com/agabani/chamber/
+site_description: ...
+site_name: Chamber
+site_url: https://agabani.github.io/chamber/docs/
+theme: readthedocs
