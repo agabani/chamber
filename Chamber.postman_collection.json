@@ -1,0 +1,483 @@
+{
+	"info": {
+		"_postman_id": "69eb46fb-9ae9-4c4b-8313-1c44a8c00b63",
+		"name": "Chamber",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1070492"
+	},
+	"item": [
+		{
+			"name": "Distribution",
+			"item": [
+				{
+					"name": "/v2/",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/v2/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"v2",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/_catalog",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/v2/_catalog",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"v2",
+								"_catalog"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/<name>/blobs/<digest>",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.docker.distribution.manifest.v2+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/v2/ubuntu/blobs/sha256:3565a89d9e81a4cb4cb2b0d947c7c11227a3f358dc216d19fc54bfd77cd5b542",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"v2",
+								"ubuntu",
+								"blobs",
+								"sha256:3565a89d9e81a4cb4cb2b0d947c7c11227a3f358dc216d19fc54bfd77cd5b542"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/<name>/manifests/<reference> (oci)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.oci.image.index.v1+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/v2/ubuntu/manifests/oci",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"v2",
+								"ubuntu",
+								"manifests",
+								"oci"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/<name>/manifests/<reference> (v2s1)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.docker.distribution.manifest.v1+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/v2/ubuntu/manifests/v2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"v2",
+								"ubuntu",
+								"manifests",
+								"v2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/<name>/manifests/<reference> (v2s2)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.docker.distribution.manifest.v2+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/v2/ubuntu/manifests/v2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"v2",
+								"ubuntu",
+								"manifests",
+								"v2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/<name>/manifests/<reference> (v2s2.list)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.docker.distribution.manifest.list.v2+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/v2/ubuntu/manifests/v2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"v2",
+								"ubuntu",
+								"manifests",
+								"v2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/<name>/tags/list",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.docker.distribution.manifest.list.v2+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/v2/ubuntu/tags/list?n=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"v2",
+								"ubuntu",
+								"tags",
+								"list"
+							],
+							"query": [
+								{
+									"key": "n",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Distribution Basic",
+			"item": [
+				{
+					"name": "/v2/",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/v2/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"v2",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/_catalog",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/v2/_catalog",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"v2",
+								"_catalog"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/<name>/blobs/<digest>",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.docker.distribution.manifest.v2+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5001/v2/ubuntu/blobs/sha256:3565a89d9e81a4cb4cb2b0d947c7c11227a3f358dc216d19fc54bfd77cd5b542",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"v2",
+								"ubuntu",
+								"blobs",
+								"sha256:3565a89d9e81a4cb4cb2b0d947c7c11227a3f358dc216d19fc54bfd77cd5b542"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/<name>/manifests/<reference> (oci)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.oci.image.index.v1+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5001/v2/ubuntu/manifests/oci",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"v2",
+								"ubuntu",
+								"manifests",
+								"oci"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/<name>/manifests/<reference> (v2s1)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.docker.distribution.manifest.v1+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5001/v2/ubuntu/manifests/v2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"v2",
+								"ubuntu",
+								"manifests",
+								"v2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/<name>/manifests/<reference> (v2s2)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.docker.distribution.manifest.v2+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5001/v2/ubuntu/manifests/v2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"v2",
+								"ubuntu",
+								"manifests",
+								"v2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/<name>/manifests/<reference> (v2s2.list)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.docker.distribution.manifest.list.v2+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5001/v2/ubuntu/manifests/v2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"v2",
+								"ubuntu",
+								"manifests",
+								"v2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/v2/<name>/tags/list",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.docker.distribution.manifest.list.v2+json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5001/v2/ubuntu/tags/list?n=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"v2",
+								"ubuntu",
+								"tags",
+								"list"
+							],
+							"query": [
+								{
+									"key": "n",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "basic",
+				"basic": [
+					{
+						"key": "password",
+						"value": "testpassword",
+						"type": "string"
+					},
+					{
+						"key": "username",
+						"value": "testuser",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}

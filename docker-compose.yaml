@@ -3,3 +3,25 @@ services:
     image: registry:2
     ports:
       - 5000:5000
+  distribution-basic:
+    depends_on:
+      distribution-basic-setup:
+        condition: service_completed_successfully
+    image: registry:2
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+    ports:
+      - 5001:5000
+    volumes:
+      - distribution:/auth
+  distribution-basic-setup:
+    image: httpd:2
+    entrypoint: ["htpasswd"]
+    command: ["-Bbc", "auth/htpasswd", "testuser", "testpassword"]
+    volumes:
+      - distribution:/usr/local/apache2/auth
+
+volumes:
+  distribution:
