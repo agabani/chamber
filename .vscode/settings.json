@@ -1,5 +1,6 @@
 {
   "files.associations": {
     "justfile": "makefile"
-  }
+  },
+  "cSpell.words": ["rustls"]
 }
