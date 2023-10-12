@@ -54,3 +54,7 @@ run:
 # test
 test:
   @cargo test
+
+# test unit
+test-unit:
+  @cargo test --lib
