@@ -1,0 +1,23 @@
+server:
+  addr: ":5003"
+
+token:
+  issuer: "docker-auth"
+  expiration: 900
+  certificate: "/certs/bundle.crt"
+  key: "/certs/bundle.key"
+
+users:
+  # Password is specified as a BCrypt hash. Use `docker run --rm --entrypoint htpasswd httpd:2 -Bbn USERNAME PASSWORD` to generate.
+  "admin":
+    password: "$2y$05$tbiN2M1kRjZWuPCZ4Pwdv.aIPJxnesHiK9jRDntLvVr/qvquJY.Nq" # password
+  "user":
+    password: "$2y$05$hqogXuZtv/HyS3ITHfP60exxO9w9G02kt96A5rhh3tXXyI9mbhEsK" # password
+
+acl:
+  - match: {account: "admin"}
+    actions: ["*"]
+    comment: "Admin has full access to everything."
+  - match: {account: "user"}
+    actions: ["pull"]
+    comment: "User \"user\" can pull stuff."

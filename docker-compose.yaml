@@ -3,6 +3,7 @@ services:
     image: registry:2
     ports:
       - 5000:5000
+
   distribution-basic:
     depends_on:
       distribution-basic-setup:
@@ -15,13 +16,66 @@ services:
     ports:
       - 5001:5000
     volumes:
-      - distribution:/auth
+      - distribution-basic:/auth
+
   distribution-basic-setup:
     image: httpd:2
     entrypoint: ["htpasswd"]
-    command: ["-Bbc", "auth/htpasswd", "testuser", "testpassword"]
+    command: ["-Bbc", "auth/htpasswd", "admin", "password"]
     volumes:
-      - distribution:/usr/local/apache2/auth
+      - distribution-basic:/usr/local/apache2/auth
+
+  distribution-token:
+    depends_on:
+      docker-auth-setup:
+        condition: service_completed_successfully
+    image: registry:2
+    environment:
+      REGISTRY_AUTH: token
+      REGISTRY_AUTH_TOKEN_ISSUER: docker-auth
+      REGISTRY_AUTH_TOKEN_REALM: http://127.0.0.1:5003/auth
+      REGISTRY_AUTH_TOKEN_SERVICE: Docker registry
+      REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE: /certs/bundle.crt
+    ports:
+      - 5002:5000
+    volumes:
+      - docker-auth:/certs
+
+  docker-auth:
+    depends_on:
+      docker-auth-setup:
+        condition: service_completed_successfully
+    image: cesanta/docker_auth:latest
+    ports:
+      - 5003:5003
+    volumes:
+      - ./.docker/docker-auth/config:/config:ro
+      - docker-auth:/certs
+
+  docker-auth-setup:
+    image: alpine/openssl
+    entrypoint: ["openssl"]
+    command:
+      [
+        "req",
+        "-subj",
+        "/CN=docker-auth",
+        "-new",
+        "-newkey",
+        "rsa:4096",
+        "-sha256",
+        "-days",
+        "365",
+        "-nodes",
+        "-x509",
+        "-keyout",
+        "/certs/bundle.key",
+        "-out",
+        "/certs/bundle.crt",
+      ]
+    volumes:
+      - docker-auth:/certs
 
 volumes:
-  distribution:
+  distribution-basic:
+  docker-auth:
