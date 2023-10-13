@@ -3,7 +3,7 @@ use std::{future::Future, pin::Pin};
 use hyper::{Body, Request, Response};
 use tower::Service;
 
-///
+/// Check whether or not the registry implements distribution specification.
 pub struct SupportService<T> {
     inner: T,
 }
@@ -54,7 +54,7 @@ where
     }
 }
 
-///
+/// Check whether or not the registry implements distribution specification.
 pub struct SupportRequest {
     inner: hyper::http::request::Builder,
 }
@@ -67,8 +67,8 @@ impl SupportRequest {
         }
     }
 
-    ///
-    pub fn base_url(self, value: &str) -> Self {
+    /// Set the URI for this request.
+    pub fn base_uri(self, value: &str) -> Self {
         Self {
             inner: self.inner.uri(format!("{value}/v2/")),
         }
@@ -79,19 +79,19 @@ impl SupportRequest {
     }
 }
 
-///
+/// Check whether or not the registry implements distribution specification.
 pub struct SupportResponse {
     parts: hyper::http::response::Parts,
 }
 
 impl SupportResponse {
-    ///
+    /// The response's status.
     pub fn status(&self) -> hyper::http::StatusCode {
         self.parts.status
     }
 }
 
-///
+/// Layer to check whether or not the registry implements distribution specification.
 pub struct SupportLayer;
 
 impl<S> tower::Layer<S> for SupportLayer {

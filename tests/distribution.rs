@@ -42,9 +42,9 @@ async fn v2_returns_unit() {
 #[tokio::test]
 async fn v2_returns_unit_s() {
     // Arrange
-    let mut service = service::support::SupportLayer.layer(hyper::Client::new());
+    let mut service = service::SupportLayer.layer(hyper::Client::new());
 
-    let request = service::support::SupportRequest::new().base_url(BASE_URL);
+    let request = service::SupportRequest::new().base_uri(BASE_URL);
 
     // Act
     let response = service.ready().await.unwrap().call(request).await.unwrap();
