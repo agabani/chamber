@@ -1,8 +1,10 @@
 use chamber::distribution::{
     api::{SupportAPI, SupportRequest},
     client::Client,
+    service,
 };
 use hyper::{Body, Request};
+use tower::{Layer, Service, ServiceExt};
 
 const BASE_URL: &str = "http://localhost:5000";
 
@@ -32,6 +34,20 @@ async fn v2_returns_unit() {
 
     // Act
     let response = api.check(request).await.unwrap();
+
+    // Assert
+    assert_eq!(hyper::http::StatusCode::OK, response.status());
+}
+
+#[tokio::test]
+async fn v2_returns_unit_s() {
+    // Arrange
+    let mut service = service::support::SupportLayer.layer(hyper::Client::new());
+
+    let request = service::support::SupportRequest::new().base_url(BASE_URL);
+
+    // Act
+    let response = service.ready().await.unwrap().call(request).await.unwrap();
 
     // Assert
     assert_eq!(hyper::http::StatusCode::OK, response.status());

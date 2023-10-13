@@ -30,3 +30,9 @@ impl From<BoxError> for Error {
         }
     }
 }
+
+impl From<hyper::Error> for Error {
+    fn from(value: hyper::Error) -> Self {
+        Self::Hyper(value)
+    }
+}
