@@ -1,6 +1,6 @@
 use std::{future::Future, pin::Pin};
 
-use tower::{Layer, Service};
+use tower::{Layer, Service, ServiceExt};
 
 #[allow(clippy::module_name_repetitions)]
 /// Layer to authenticate requests.
@@ -22,8 +22,9 @@ pub struct AuthenticationService<S> {
 
 impl<S, Request> Service<Request> for AuthenticationService<S>
 where
-    S: Service<Request>,
+    S: Service<Request> + Clone + 'static,
     S::Future: 'static,
+    Request: 'static,
 {
     type Response = S::Response;
 
@@ -39,9 +40,12 @@ where
     }
 
     fn call(&mut self, req: Request) -> Self::Future {
-        let fut = self.inner.call(req);
+        let mut inner = self.inner.clone();
 
-        let f = async move { fut.await };
+        let f = async move {
+            //
+            inner.ready().await?.call(req).await
+        };
 
         Box::pin(f)
     }
