@@ -1,4 +1,4 @@
-use chamber::distribution::service::{SupportLayer, SupportRequest};
+use chamber::distribution::service::{AuthenticationLayer, SupportLayer, SupportRequest};
 use hyper::{http::StatusCode, Client};
 use tower::{Layer, Service, ServiceExt};
 
@@ -16,4 +16,18 @@ async fn v2_returns_401() {
 
     // Assert
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+}
+
+#[tokio::test]
+async fn v2_returns_200() {
+    // Arrange
+    let mut service = SupportLayer.layer(AuthenticationLayer.layer(Client::new()));
+
+    let request = SupportRequest::new().base_uri(BASE_URL);
+
+    // Act
+    let response = service.ready().await.unwrap().call(request).await.unwrap();
+
+    // Assert
+    assert_eq!(response.status(), StatusCode::OK);
 }

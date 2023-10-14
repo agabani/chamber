@@ -1,13 +1,13 @@
 use std::{future::Future, pin::Pin};
 
 use hyper::{Body, Request, Response};
-use tower::Service;
+use tower::{Layer, Service};
 
 /// Layer to check whether or not the registry implements distribution specification.
 #[allow(clippy::module_name_repetitions)]
 pub struct SupportLayer;
 
-impl<S> tower::Layer<S> for SupportLayer {
+impl<S> Layer<S> for SupportLayer {
     type Service = SupportService<S>;
 
     fn layer(&self, inner: S) -> Self::Service {
