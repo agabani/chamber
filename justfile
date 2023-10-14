@@ -26,6 +26,14 @@ container-registry-seed-login:
 container-registry-stop:
   @docker compose down --remove-orphans --volumes
 
+# doc
+doc:
+  @cargo doc
+
+# doc open
+doc-open:
+  @cargo doc --open
+
 # format
 format:
   @cargo fmt

@@ -1,21 +1,19 @@
-use chamber::distribution::client::Client;
-use hyper::{Body, Request};
+use chamber::distribution::service::{SupportLayer, SupportRequest};
+use hyper::{http::StatusCode, Client};
+use tower::{Layer, Service, ServiceExt};
 
 const BASE_URL: &str = "http://localhost:5002";
 
 #[tokio::test]
 async fn v2_returns_401() {
     // Arrange
-    let mut client = Client::new(hyper::Client::new());
+    let mut service = SupportLayer.layer(Client::new());
 
-    let request = Request::builder()
-        .uri(format!("{BASE_URL}/v2/"))
-        .body(Body::empty())
-        .unwrap();
+    let request = SupportRequest::new().base_uri(BASE_URL);
 
     // Act
-    let response = client.send(request).await.unwrap();
+    let response = service.ready().await.unwrap().call(request).await.unwrap();
 
     // Assert
-    assert_eq!(hyper::http::StatusCode::UNAUTHORIZED, response.status());
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 }
