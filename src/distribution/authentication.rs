@@ -144,3 +144,27 @@ pub struct Bearer {
     #[serde(rename = "token")]
     pub token: String,
 }
+
+/// Collection of [`Solver`].
+pub struct Solvers {
+    inner: Vec<Box<dyn Solver>>,
+}
+
+impl Solvers {
+    /// Create a [`Solvers`] using a custom [`Solver`] stack.
+    pub fn new(inner: Vec<Box<dyn Solver>>) -> Self {
+        Self { inner }
+    }
+
+    /// Create a [`Solvers`] using all [`Solver`] in [`chamber`][`crate`].
+    pub fn all(client: Client) -> Self {
+        Self {
+            inner: vec![Box::new(BasicSolver), Box::new(BearerSolver::new(client))],
+        }
+    }
+
+    /// Returns an iterator over the slice.
+    pub fn iter(&self) -> std::slice::Iter<'_, Box<dyn Solver>> {
+        self.inner.iter()
+    }
+}
