@@ -1,6 +1,6 @@
 use chamber::{
     distribution::{
-        authentication::{Authentication, AuthenticationChallengeSolver, Credential},
+        authentication::{Authentication, ChallengeSolver, Credential},
         client::Client,
     },
     parser::www_authenticate::WwwAuthenticate,
@@ -48,11 +48,11 @@ async fn workflow() {
 
     println!("{www_authenticate:?}");
 
-    let solver = AuthenticationChallengeSolver::new(client.clone());
+    let solver = ChallengeSolver::new(client.clone());
 
     let authentication = solver
         .solve(
-            &www_authenticate,
+            &www_authenticate.challenges[0],
             &Credential::UsernamePassword("admin".to_string(), "password".to_string()),
         )
         .await

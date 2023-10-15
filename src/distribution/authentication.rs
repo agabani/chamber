@@ -1,15 +1,15 @@
 use base64::{engine::general_purpose, Engine as _};
 
-use crate::parser::www_authenticate::{AuthParam, WwwAuthenticate};
+use crate::parser::www_authenticate::{AuthParam, Challenge};
 
 use super::client::Client;
 
 ///
-pub struct AuthenticationChallengeSolver {
+pub struct ChallengeSolver {
     client: Client,
 }
 
-impl AuthenticationChallengeSolver {
+impl ChallengeSolver {
     ///
     pub fn new(client: Client) -> Self {
         Self { client }
@@ -18,23 +18,19 @@ impl AuthenticationChallengeSolver {
     ///
     pub async fn solve(
         &self,
-        www_authenticate: &WwwAuthenticate<'_>,
+        challenge: &Challenge<'_>,
         credential: &Credential,
     ) -> Result<Authentication, ()> {
-        for challenge in &www_authenticate.challenges {
-            match challenge.auth_scheme {
-                "Basic" => match self.solve_basic(credential, &challenge.auth_params).await {
-                    Ok(authentication) => return Ok(authentication),
-                    Err(_) => todo!(),
-                },
-                "Bearer" => {
-                    todo!()
-                }
-                _ => todo!(),
+        match challenge.auth_scheme {
+            "Basic" => match self.solve_basic(credential, &challenge.auth_params).await {
+                Ok(authentication) => return Ok(authentication),
+                Err(_) => todo!(),
+            },
+            "Bearer" => {
+                todo!()
             }
+            _ => todo!(),
         }
-
-        return Err(());
     }
 
     async fn solve_basic(
