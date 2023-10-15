@@ -1,6 +1,9 @@
 use chamber::{
-    distribution::client::Client,
-    parser::www_authenticate::{self, WwwAuthenticate},
+    distribution::{
+        authentication::{Authentication, AuthenticationChallengeSolver, Credential},
+        client::Client,
+    },
+    parser::www_authenticate::WwwAuthenticate,
 };
 use hyper::{Body, Method, Request, StatusCode};
 
@@ -45,11 +48,26 @@ async fn workflow() {
 
     println!("{www_authenticate:?}");
 
+    let solver = AuthenticationChallengeSolver::new(client.clone());
+
+    let authentication = solver
+        .solve(
+            &www_authenticate,
+            &Credential::UsernamePassword("admin".to_string(), "password".to_string()),
+        )
+        .await
+        .unwrap();
+
+    let authorization = match authentication {
+        Authentication::Basic(authorization) => format!("Basic {authorization}"),
+        Authentication::Bearer => todo!(),
+    };
+
     // Act
     let request = Request::builder()
         .method(Method::GET)
         .uri(format!("{BASE_URL}/v2/"))
-        .header("Authorization", "Basic YWRtaW46cGFzc3dvcmQ=")
+        .header("Authorization", authorization)
         .body(Body::empty())
         .unwrap();
 
