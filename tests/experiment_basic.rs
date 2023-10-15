@@ -1,6 +1,6 @@
 use chamber::{
     distribution::{
-        authentication::{Authentication, ChallengeSolver, Credential},
+        authentication::{Authentication, BasicSolver, Credential, Solver},
         client::Client,
     },
     parser::www_authenticate::WwwAuthenticate,
@@ -48,7 +48,7 @@ async fn workflow() {
 
     println!("{www_authenticate:?}");
 
-    let solver = ChallengeSolver::new(client.clone());
+    let solver = BasicSolver;
 
     let authentication = solver
         .solve(
@@ -56,11 +56,12 @@ async fn workflow() {
             &Credential::UsernamePassword("admin".to_string(), "password".to_string()),
         )
         .await
+        .unwrap()
         .unwrap();
 
     let authorization = match authentication {
         Authentication::Basic(authorization) => format!("Basic {authorization}"),
-        Authentication::Bearer => todo!(),
+        Authentication::Bearer(_) => todo!(),
     };
 
     // Act

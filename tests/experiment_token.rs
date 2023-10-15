@@ -1,7 +1,11 @@
-use chamber::{distribution::client::Client, parser::www_authenticate::WwwAuthenticate};
-use hyper::body::HttpBody;
+use chamber::{
+    distribution::{
+        authentication::{Authentication, BearerSolver, Credential, Solver},
+        client::Client,
+    },
+    parser::www_authenticate::WwwAuthenticate,
+};
 use hyper::{Body, Method, Request, StatusCode};
-use url::Url;
 
 const BASE_URL: &str = "http://localhost:5002";
 
@@ -44,36 +48,27 @@ async fn workflow() {
 
     println!("{www_authenticate:?}");
 
-    let bearer = www_authenticate
-        .challenges
-        .iter()
-        .find(|f| f.auth_scheme == "Bearer")
+    let solver = BearerSolver::new(client.clone());
+
+    let authentication = solver
+        .solve(
+            &www_authenticate.challenges[0],
+            &Credential::UsernamePassword("admin".to_string(), "password".to_string()),
+        )
+        .await
+        .unwrap()
         .unwrap();
 
-    println!("{bearer:?}");
+    let authorization = match authentication {
+        Authentication::Basic(_) => todo!(),
+        Authentication::Bearer(bearer) => format!("Bearer {}", bearer.access_token),
+    };
 
-    let mut url = bearer
-        .auth_params
-        .iter()
-        .find_map(|auth_param| {
-            if auth_param.key == "realm" {
-                Some(Url::parse(auth_param.value.as_ref()).unwrap())
-            } else {
-                None
-            }
-        })
-        .unwrap();
-
-    for auth_param in &bearer.auth_params {
-        if auth_param.key != "realm" {
-            url.query_pairs_mut()
-                .append_pair(auth_param.key.as_ref(), auth_param.value.as_ref());
-        }
-    }
-
+    // Act
     let request = Request::builder()
-        .uri(url.to_string())
-        .header("Authorization", "Basic YWRtaW46cGFzc3dvcmQ=")
+        .method(Method::GET)
+        .uri(format!("{BASE_URL}/v2/"))
+        .header("Authorization", authorization)
         .body(Body::empty())
         .unwrap();
 
@@ -81,12 +76,4 @@ async fn workflow() {
 
     // Assert
     assert_eq!(response.status(), StatusCode::OK);
-    println!("{response:?}");
-
-    let mut body = response.into_body();
-
-    while let Some(result) = body.data().await {
-        let bytes = result.unwrap();
-        println!("{bytes:?}");
-    }
 }

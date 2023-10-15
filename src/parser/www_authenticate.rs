@@ -11,14 +11,14 @@ use nom::{
 };
 
 /// WWW-Authenticate response header.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WwwAuthenticate<'a> {
     /// Challenges.
     pub challenges: Vec<Challenge<'a>>,
 }
 
 /// Challenge.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Challenge<'a> {
     /// Authentication scheme.
     pub auth_scheme: Cow<'a, str>,
@@ -27,7 +27,7 @@ pub struct Challenge<'a> {
 }
 
 /// Authentication parameter.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AuthParam<'a> {
     /// Key.
     pub key: Cow<'a, str>,
