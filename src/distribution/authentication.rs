@@ -16,6 +16,7 @@ pub enum Credential {
 }
 
 /// Authentication.
+#[derive(Debug, Clone)]
 pub enum Authentication {
     /// Basic.
     Basic(String),
@@ -134,7 +135,7 @@ impl Solver for BearerSolver {
 }
 
 ///
-#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct Bearer {
     ///
     #[serde(rename = "access_token")]
