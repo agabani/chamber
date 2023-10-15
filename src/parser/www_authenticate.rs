@@ -33,7 +33,10 @@ fn auth_param<'a>() -> impl FnMut(&'a str) -> IResult<&'a str, (&'a str, &'a str
 }
 
 fn auth_params<'a>() -> impl FnMut(&'a str) -> IResult<&'a str, Vec<(&'a str, &'a str)>> {
-    separated_list0(tag(","), auth_param())
+    separated_list0(
+        delimited(whitespace(), tag(","), whitespace()),
+        auth_param(),
+    )
 }
 
 fn challenge<'a>() -> impl FnMut(&'a str) -> IResult<&'a str, (&'a str, Vec<(&'a str, &'a str)>)> {
@@ -46,6 +49,10 @@ fn quoted_string<'a>() -> impl FnMut(&'a str) -> IResult<&'a str, &'a str> {
 
 fn token<'a>() -> impl Fn(&'a str) -> IResult<&'a str, &'a str> {
     is_a("!#$%&'*+-.^_`|~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+}
+
+fn whitespace<'a>() -> impl Fn(&'a str) -> IResult<&'a str, &'a str> {
+    take_while(|c| c == ' ')
 }
 
 #[cfg(test)]
