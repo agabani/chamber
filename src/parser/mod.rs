@@ -1,1 +1,2 @@
-mod www_authenticate;
+///
+pub mod www_authenticate;

@@ -8,24 +8,33 @@ use nom::{
     IResult,
 };
 
+///
 #[derive(Debug)]
 pub struct WwwAuthenticate<'a> {
+    ///
     pub challenges: Vec<Challenge<'a>>,
 }
 
+///
 #[derive(Debug)]
 pub struct Challenge<'a> {
+    ///
     pub auth_scheme: &'a str,
+    ///
     pub auth_params: Vec<AuthParam<'a>>,
 }
 
+///
 #[derive(Debug)]
 pub struct AuthParam<'a> {
+    ///
     pub key: &'a str,
+    ///
     pub value: &'a str,
 }
 
 impl<'a> WwwAuthenticate<'a> {
+    ///
     pub fn parse(input: &'a str) -> Result<Self, nom::Err<nom::error::Error<&'a str>>> {
         let (_remaining, challenges) = all_consuming(challenges())(input)?;
 

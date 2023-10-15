@@ -1,4 +1,7 @@
-use chamber::distribution::client::Client;
+use chamber::{
+    distribution::client::Client,
+    parser::www_authenticate::{self, WwwAuthenticate},
+};
 use hyper::{Body, Method, Request, StatusCode};
 
 const BASE_URL: &str = "http://localhost:5001";
@@ -28,6 +31,19 @@ async fn workflow() {
             .unwrap(),
         "Basic realm=\"Registry Realm\""
     );
+
+    // Arrange
+    let www_authenticate = WwwAuthenticate::parse(
+        response
+            .headers()
+            .get("Www-Authenticate")
+            .unwrap()
+            .to_str()
+            .unwrap(),
+    )
+    .unwrap();
+
+    println!("{www_authenticate:?}");
 
     // Act
     let request = Request::builder()
