@@ -6,6 +6,7 @@
 /// Module for interacting with the container distribution ecosystem.
 pub mod distribution;
 mod error;
+mod parser;
 
 pub use error::{BoxError, Error};
 
