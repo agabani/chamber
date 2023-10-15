@@ -19,7 +19,7 @@ impl Support {
     pub async fn send(
         &self,
         base_url: &str,
-        authentication: &Option<Authentication>,
+        authentication: Option<&Authentication>,
     ) -> Result<Response<Body>> {
         let mut request = Request::builder()
             .method(Method::GET)

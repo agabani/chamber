@@ -10,39 +10,46 @@ use hyper::StatusCode;
 
 #[tokio::test]
 async fn normal() {
-    // Arrange
-    let client = Client::new(hyper::Client::new());
-
-    let support = Support::new(client);
-
-    // Act
-    let response = support.send("http://localhost:5000", &None).await.unwrap();
-
-    // Assert
-    assert_eq!(response.status(), StatusCode::OK);
+    run("http://localhost:5000").await;
 }
 
 #[tokio::test]
-async fn __() {
+async fn basic() {
+    run("http://localhost:5001").await;
+}
+
+#[tokio::test]
+async fn bearer() {
+    run("http://localhost:5002").await;
+}
+
+async fn run(base_url: &str) {
     // Arrange
     let client = Client::new(hyper::Client::new());
-
     let api = Support::new(client.clone());
-
     let solvers = Solvers::all(client);
-
     let credential = Credential::UsernamePassword("admin".to_string(), "password".to_string());
 
     // Act
     let (response, authentication) = support(
-        api,
+        &api,
         &solvers,
-        &Some(credential),
+        Some(&credential),
         Cow::Owned(None),
-        "http://localhost:5001",
+        base_url,
     )
     .await
     .unwrap();
+
+    // Assert
+    assert_eq!(response.status(), StatusCode::OK);
+    println!("{authentication:?}");
+
+    // Act
+    let (response, authentication) =
+        support(&api, &solvers, Some(&credential), authentication, base_url)
+            .await
+            .unwrap();
 
     // Assert
     assert_eq!(response.status(), StatusCode::OK);

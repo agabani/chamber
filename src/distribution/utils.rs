@@ -11,13 +11,13 @@ use super::{
 
 ///
 pub async fn support<'a>(
-    api: Support,
+    api: &Support,
     solvers: &Solvers,
-    credential: &Option<Credential>,
+    credential: Option<&Credential>,
     authentication: Cow<'a, Option<Authentication>>,
     base_url: &str,
 ) -> Result<(Response<Body>, Cow<'a, Option<Authentication>>)> {
-    let mut response = api.send(base_url, authentication.as_ref()).await?;
+    let mut response = api.send(base_url, authentication.as_ref().as_ref()).await?;
 
     if response.status() != StatusCode::UNAUTHORIZED {
         return Ok((response, authentication));
@@ -39,7 +39,7 @@ pub async fn support<'a>(
                 let authentication = solver.solve(challenge, credential).await.unwrap();
 
                 if let Some(authentication) = authentication {
-                    response = api.send(base_url, &Some(authentication.clone())).await?;
+                    response = api.send(base_url, Some(&authentication)).await?;
                     if response.status() != StatusCode::UNAUTHORIZED {
                         return Ok((response, Cow::Owned(Some(authentication))));
                     }
