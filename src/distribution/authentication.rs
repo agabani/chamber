@@ -21,7 +21,7 @@ impl ChallengeSolver {
         challenge: &Challenge<'_>,
         credential: &Credential,
     ) -> Result<Authentication, ()> {
-        match challenge.auth_scheme {
+        match challenge.auth_scheme.as_ref() {
             "Basic" => match self.solve_basic(credential, &challenge.auth_params).await {
                 Ok(authentication) => return Ok(authentication),
                 Err(_) => todo!(),

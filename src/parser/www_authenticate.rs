@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use nom::{
     branch::alt,
     bytes::complete::{escaped, is_a, tag, take_while},
@@ -19,7 +21,7 @@ pub struct WwwAuthenticate<'a> {
 #[derive(Debug)]
 pub struct Challenge<'a> {
     /// Authentication scheme.
-    pub auth_scheme: &'a str,
+    pub auth_scheme: Cow<'a, str>,
     /// Authentication parameters.
     pub auth_params: Vec<AuthParam<'a>>,
 }
@@ -28,9 +30,9 @@ pub struct Challenge<'a> {
 #[derive(Debug)]
 pub struct AuthParam<'a> {
     /// Key.
-    pub key: &'a str,
+    pub key: Cow<'a, str>,
     /// Value.
-    pub value: &'a str,
+    pub value: Cow<'a, str>,
 }
 
 impl<'a> WwwAuthenticate<'a> {
@@ -42,10 +44,13 @@ impl<'a> WwwAuthenticate<'a> {
             challenges: challenges
                 .into_iter()
                 .map(|(auth_scheme, auth_params)| Challenge {
-                    auth_scheme,
+                    auth_scheme: Cow::Borrowed(auth_scheme),
                     auth_params: auth_params
                         .into_iter()
-                        .map(|(key, value)| AuthParam { key, value })
+                        .map(|(key, value)| AuthParam {
+                            key: Cow::Borrowed(key),
+                            value: Cow::Borrowed(value),
+                        })
                         .collect(),
                 })
                 .collect(),

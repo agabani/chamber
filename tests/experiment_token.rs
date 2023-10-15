@@ -57,7 +57,7 @@ async fn workflow() {
         .iter()
         .find_map(|auth_param| {
             if auth_param.key == "realm" {
-                Some(Url::parse(auth_param.value).unwrap())
+                Some(Url::parse(auth_param.value.as_ref()).unwrap())
             } else {
                 None
             }
@@ -67,7 +67,7 @@ async fn workflow() {
     for auth_param in &bearer.auth_params {
         if auth_param.key != "realm" {
             url.query_pairs_mut()
-                .append_pair(auth_param.key, auth_param.value);
+                .append_pair(auth_param.key.as_ref(), auth_param.value.as_ref());
         }
     }
 
