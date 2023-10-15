@@ -1,30 +1,46 @@
 use nom::{
     branch::alt,
-    bytes::complete::{is_a, tag, take_until, take_while},
-    combinator::rest,
+    bytes::complete::{escaped, is_a, tag, take_while},
+    character::complete::{none_of, one_of},
+    combinator::all_consuming,
     multi::{separated_list0, separated_list1},
-    sequence::{delimited, preceded, separated_pair, terminated},
+    sequence::{delimited, separated_pair},
     IResult,
 };
 
+#[derive(Debug)]
 pub struct WwwAuthenticate<'a> {
-    challenges: Vec<Challenge<'a>>,
+    pub challenges: Vec<Challenge<'a>>,
 }
 
+#[derive(Debug)]
 pub struct Challenge<'a> {
-    auth_scheme: &'a str,
-    auth_params: Vec<AuthParam<'a>>,
+    pub auth_scheme: &'a str,
+    pub auth_params: Vec<AuthParam<'a>>,
 }
+
+#[derive(Debug)]
 pub struct AuthParam<'a> {
-    key: &'a str,
-    value: &'a str,
+    pub key: &'a str,
+    pub value: &'a str,
 }
 
 impl<'a> WwwAuthenticate<'a> {
     pub fn parse(input: &'a str) -> Result<Self, nom::Err<nom::error::Error<&'a str>>> {
-        let x = auth_param()(input)?;
+        let (_remaining, challenges) = all_consuming(challenges())(input)?;
 
-        todo!()
+        Ok(Self {
+            challenges: challenges
+                .into_iter()
+                .map(|(auth_scheme, auth_params)| Challenge {
+                    auth_scheme,
+                    auth_params: auth_params
+                        .into_iter()
+                        .map(|(key, value)| AuthParam { key, value })
+                        .collect(),
+                })
+                .collect(),
+        })
     }
 }
 
@@ -43,8 +59,17 @@ fn challenge<'a>() -> impl FnMut(&'a str) -> IResult<&'a str, (&'a str, Vec<(&'a
     separated_pair(token(), tag(" "), auth_params())
 }
 
+fn challenges<'a>(
+) -> impl FnMut(&'a str) -> IResult<&'a str, Vec<(&'a str, Vec<(&'a str, &'a str)>)>> {
+    separated_list1(delimited(whitespace(), tag(","), whitespace()), challenge())
+}
+
 fn quoted_string<'a>() -> impl FnMut(&'a str) -> IResult<&'a str, &'a str> {
-    delimited(tag("\""), take_until("\""), tag("\""))
+    delimited(
+        tag("\""),
+        escaped(none_of(r#"\""#), '\\', one_of(r#"""#)),
+        tag("\""),
+    )
 }
 
 fn token<'a>() -> impl Fn(&'a str) -> IResult<&'a str, &'a str> {
@@ -57,21 +82,36 @@ fn whitespace<'a>() -> impl Fn(&'a str) -> IResult<&'a str, &'a str> {
 
 #[cfg(test)]
 mod tests {
-    use super::{auth_param, auth_params, challenge, quoted_string, token};
+    use super::{
+        auth_param, auth_params, challenge, challenges, quoted_string, token, WwwAuthenticate,
+    };
 
     #[test]
     fn basic() {
-        let x = r#"Basic realm="Registry Realm""#;
+        let input = r#"Basic realm="Registry Realm""#;
+
+        let www_authenticate = WwwAuthenticate::parse(input).unwrap();
+
+        println!("{www_authenticate:?}");
     }
 
     #[test]
     fn bearer() {
-        let x = r#"Bearer realm="http://127.0.0.1:5003/auth",service="Docker registry",error="invalid_token""#;
+        let input = r#"Bearer realm="http://127.0.0.1:5003/auth",service="Docker registry",error="invalid_token""#;
+
+        let www_authenticate = WwwAuthenticate::parse(input).unwrap();
+
+        println!("{www_authenticate:?}");
     }
 
     #[test]
     fn rfc() {
-        let x = r#"Newauth realm="apps", type=1, title="Login to \"apps\"", Basic realm="simple""#;
+        let input =
+            r#"Newauth realm="apps", type=1, title="Login to \"apps\"", Basic realm="simple""#;
+
+        let www_authenticate = WwwAuthenticate::parse(input).unwrap();
+
+        println!("{www_authenticate:?}");
     }
 
     #[test]
@@ -107,7 +147,7 @@ mod tests {
         let input =
             r#"Newauth realm="apps", type=1, title="Login to \"apps\"", Basic realm="simple""#;
 
-        let (remaining, challenges) = challenge()(input).unwrap();
+        let (remaining, challenges) = challenges()(input).unwrap();
 
         println!("remaining:{remaining} challenge:{challenges:?}");
     }
@@ -115,6 +155,15 @@ mod tests {
     #[test]
     fn test_quoted_string() {
         let input = r#""Docker registry""#;
+
+        let (remaining, string) = quoted_string()(input).unwrap();
+
+        println!("remaining:{remaining} string:{string:?}");
+    }
+
+    #[test]
+    fn test_quoted_string_escaped() {
+        let input = r#""Login to \"apps\"""#;
 
         let (remaining, string) = quoted_string()(input).unwrap();
 
