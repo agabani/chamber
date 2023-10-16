@@ -51,8 +51,11 @@ async fn run(base_url: String) {
         authentication
     };
 
+    println!("{authentication:?}");
+    println!("");
+
     // # Catalog
-    let authentication = {
+    let (catalog_response, authentication) = {
         // Arrange
         let api = api::Catalog::new(client.clone());
 
@@ -77,10 +80,52 @@ async fn run(base_url: String) {
             api::CatalogResponseBody_::Ok(response) => {
                 assert_eq!(response.repositories.len(), 1);
                 assert_eq!(response.repositories[0], "ubuntu");
+
+                (response, authentication)
             }
             api::CatalogResponseBody_::Err(error) => panic!("{error:?}"),
         }
-
-        authentication
     };
+
+    println!("{authentication:?}");
+    println!("");
+
+    // # Tags List
+    let (tags_list_response, authentication) = {
+        // Arrange
+        let api = api::TagsList::new(client.clone());
+
+        let request = api::TagsListRequest {
+            base_url: base_url.clone(),
+            repository: catalog_response.repositories[0].clone(),
+        };
+
+        // Act
+        let (response, authentication) =
+            utils::tags_list(&api, &solvers, Some(&credential), authentication, &request)
+                .await
+                .unwrap();
+
+        // Assert
+        assert_eq!(response.raw.status(), hyper::StatusCode::OK);
+
+        // Act
+        let response = response.body().await.unwrap();
+
+        // Assert
+        match response {
+            api::TagsListResponseBody::Ok(response) => {
+                assert_eq!(response.name, "ubuntu");
+                assert_eq!(response.tags.len(), 2);
+                assert_eq!(response.tags[0], "v2");
+                assert_eq!(response.tags[1], "oci");
+
+                (response, authentication)
+            }
+            api::TagsListResponseBody::Err(error) => panic!("{error:?}"),
+        }
+    };
+
+    println!("{authentication:?}");
+    println!("");
 }

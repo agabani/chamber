@@ -7,4 +7,6 @@ pub mod client;
 /// Services for structured interaction with container distribution API.
 pub mod service;
 ///
+pub mod spec;
+///
 pub mod utils;

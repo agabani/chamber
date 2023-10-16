@@ -22,30 +22,40 @@ pub struct ErrorResponseBodyError {
     pub code: String,
 
     ///
-    #[serde(rename = "message")]
-    pub message: String,
-
-    ///
     #[serde(rename = "detail")]
     pub detail: Vec<ErrorResponseBodyErrorDetail>,
+
+    ///
+    #[serde(rename = "message")]
+    pub message: String,
 }
 
 ///
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ErrorResponseBodyErrorDetail {
     ///
-    #[serde(rename = "Type")]
-    pub type_: String,
+    #[serde(rename = "Action")]
+    pub action: String,
 
     ///
     #[serde(rename = "Class")]
     pub class: String,
 
     ///
+    #[serde(rename = "Type")]
+    pub type_: String,
+
+    ///
     #[serde(rename = "Name")]
+    pub name: String,
+}
+
+///
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub struct TagsListResponseBody {
+    ///
     pub name: String,
 
     ///
-    #[serde(rename = "Action")]
-    pub action: String,
+    pub tags: Vec<String>,
 }

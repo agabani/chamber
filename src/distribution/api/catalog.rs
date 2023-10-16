@@ -1,13 +1,13 @@
 use hyper::{Body, Method, Request, Response, StatusCode};
 
 use crate::{
-    distribution::{api::CatalogResponseBody, utils::deserialize_response_body},
+    distribution::{
+        authentication::Authentication,
+        client::Client,
+        spec::{CatalogResponseBody, ErrorResponseBody},
+        utils::deserialize_response_body,
+    },
     Result,
-};
-
-use super::{
-    super::{authentication::Authentication, client::Client},
-    ErrorResponseBody,
 };
 
 ///
