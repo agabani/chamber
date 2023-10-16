@@ -18,12 +18,12 @@ impl Support {
     ///
     pub async fn send(
         &self,
-        base_url: &str,
+        request: &SupportRequest,
         authentication: Option<&Authentication>,
-    ) -> Result<Response<Body>> {
+    ) -> Result<SupportResponse> {
         let mut request = Request::builder()
             .method(Method::GET)
-            .uri(format!("{base_url}/v2/"));
+            .uri(format!("{}/v2/", request.base_url));
 
         if let Some(authentication) = authentication {
             let authorization = match authentication {
@@ -38,6 +38,18 @@ impl Support {
 
         let response = self.client.send(request).await.unwrap();
 
-        Ok(response)
+        Ok(SupportResponse { raw: response })
     }
+}
+
+///
+pub struct SupportRequest {
+    ///
+    pub base_url: String,
+}
+
+///
+pub struct SupportResponse {
+    ///
+    pub raw: Response<Body>,
 }

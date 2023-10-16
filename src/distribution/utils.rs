@@ -1,11 +1,11 @@
 use std::borrow::Cow;
 
-use hyper::{Body, Response, StatusCode};
+use hyper::StatusCode;
 
 use crate::{parser::www_authenticate::WwwAuthenticate, Result};
 
 use super::{
-    api::Support,
+    api::{Support, SupportRequest, SupportResponse},
     authentication::{Authentication, Credential, Solvers},
 };
 
@@ -15,15 +15,16 @@ pub async fn support<'a>(
     solvers: &Solvers,
     credential: Option<&Credential>,
     authentication: Cow<'a, Option<Authentication>>,
-    base_url: &str,
-) -> Result<(Response<Body>, Cow<'a, Option<Authentication>>)> {
-    let mut response = api.send(base_url, authentication.as_ref().as_ref()).await?;
+    request: &SupportRequest,
+) -> Result<(SupportResponse, Cow<'a, Option<Authentication>>)> {
+    let mut response = api.send(request, authentication.as_ref().as_ref()).await?;
 
-    if response.status() != StatusCode::UNAUTHORIZED {
+    if response.raw.status() != StatusCode::UNAUTHORIZED {
         return Ok((response, authentication));
     }
 
     let header = response
+        .raw
         .headers()
         .get("Www-Authenticate")
         .unwrap()
@@ -39,8 +40,8 @@ pub async fn support<'a>(
                 let authentication = solver.solve(challenge, credential).await.unwrap();
 
                 if let Some(authentication) = authentication {
-                    response = api.send(base_url, Some(&authentication)).await?;
-                    if response.status() != StatusCode::UNAUTHORIZED {
+                    response = api.send(request, Some(&authentication)).await?;
+                    if response.raw.status() != StatusCode::UNAUTHORIZED {
                         return Ok((response, Cow::Owned(Some(authentication))));
                     }
                 }
