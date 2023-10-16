@@ -1,10 +1,10 @@
 use std::borrow::Cow;
 
 use chamber::distribution::{
-    api::{Support, SupportRequest},
+    api::{Catalog, CatalogRequest, CatalogResponseBody_},
     authentication::{Credential, Solvers},
     client::Client,
-    utils::support,
+    utils::catalog,
 };
 use hyper::StatusCode;
 
@@ -26,13 +26,13 @@ async fn bearer() {
 async fn run(base_url: String) {
     // Arrange
     let client = Client::new(hyper::Client::new());
-    let api = Support::new(client.clone());
+    let api = Catalog::new(client.clone());
     let solvers = Solvers::all(client);
     let credential = Credential::UsernamePassword("admin".to_string(), "password".to_string());
-    let request = SupportRequest { base_url };
+    let request = CatalogRequest { base_url };
 
     // Act
-    let (response, authentication) = support(
+    let (response, authentication) = catalog(
         &api,
         &solvers,
         Some(&credential),
@@ -46,13 +46,27 @@ async fn run(base_url: String) {
     assert_eq!(response.raw.status(), StatusCode::OK);
     println!("{authentication:?}");
 
+    let json = response.body().await.unwrap();
+
+    match json {
+        CatalogResponseBody_::Ok(body) => println!("{body:?}"),
+        CatalogResponseBody_::Err(body) => println!("{body:?}"),
+    }
+
     // Act
     let (response, authentication) =
-        support(&api, &solvers, Some(&credential), authentication, &request)
+        catalog(&api, &solvers, Some(&credential), authentication, &request)
             .await
             .unwrap();
 
     // Assert
     assert_eq!(response.raw.status(), StatusCode::OK);
     println!("{authentication:?}");
+
+    let json = response.body().await.unwrap();
+
+    match json {
+        CatalogResponseBody_::Ok(body) => println!("{body:?}"),
+        CatalogResponseBody_::Err(body) => println!("{body:?}"),
+    }
 }

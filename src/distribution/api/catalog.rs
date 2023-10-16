@@ -1,8 +1,14 @@
-use hyper::{Body, Method, Request, Response};
+use hyper::{Body, Method, Request, Response, StatusCode};
 
-use crate::Result;
+use crate::{
+    distribution::{api::CatalogResponseBody, utils::deserialize_response_body},
+    Result,
+};
 
-use super::super::{authentication::Authentication, client::Client};
+use super::{
+    super::{authentication::Authentication, client::Client},
+    ErrorResponseBody,
+};
 
 ///
 pub struct Catalog {
@@ -52,4 +58,32 @@ pub struct CatalogRequest {
 pub struct CatalogResponse {
     ///
     pub raw: Response<Body>,
+}
+
+impl CatalogResponse {
+    ///
+    pub fn new(raw: Response<Body>) -> Self {
+        Self { raw }
+    }
+
+    ///
+    pub async fn body(self) -> Result<CatalogResponseBody_, serde_json::Error> {
+        match self.raw.status() {
+            StatusCode::OK => deserialize_response_body::<CatalogResponseBody>(self.raw)
+                .await
+                .map(CatalogResponseBody_::Ok),
+            StatusCode::UNAUTHORIZED => deserialize_response_body::<ErrorResponseBody>(self.raw)
+                .await
+                .map(CatalogResponseBody_::Err),
+            status_code => todo!("{status_code}"),
+        }
+    }
+}
+
+///
+pub enum CatalogResponseBody_ {
+    ///
+    Ok(CatalogResponseBody),
+    ///
+    Err(ErrorResponseBody),
 }

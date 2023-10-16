@@ -1,5 +1,5 @@
 ///
-#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct CatalogResponseBody {
     ///
     #[serde(rename = "repositories")]
@@ -7,7 +7,7 @@ pub struct CatalogResponseBody {
 }
 
 ///
-#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ErrorResponseBody {
     ///
     #[serde(rename = "errors")]
@@ -15,7 +15,7 @@ pub struct ErrorResponseBody {
 }
 
 ///
-#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ErrorResponseBodyError {
     ///
     #[serde(rename = "code")]
@@ -31,7 +31,7 @@ pub struct ErrorResponseBodyError {
 }
 
 ///
-#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ErrorResponseBodyErrorDetail {
     ///
     #[serde(rename = "Type")]
