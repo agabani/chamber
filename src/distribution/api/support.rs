@@ -1,8 +1,10 @@
 use hyper::{Body, Method, Request, Response};
+use url::Url;
 
-use crate::Result;
-
-use super::super::{authentication::Authentication, client::Client};
+use crate::{
+    distribution::{api::ApiError, authentication::Authentication, client::Client},
+    Result,
+};
 
 ///
 pub struct Support {
@@ -20,21 +22,16 @@ impl Support {
         &self,
         request: &SupportRequest,
         authentication: Option<&Authentication>,
-    ) -> Result<SupportResponse> {
-        let mut request = Request::builder()
-            .method(Method::GET)
-            .uri(format!("{}/v2/", request.base_url));
+    ) -> Result<SupportResponse, ApiError> {
+        let mut url = Url::parse(&request.base_url).map_err(ApiError::Parse)?;
+        url.set_path("/v2/");
 
+        let mut request = Request::builder().method(Method::GET).uri(url.to_string());
         if let Some(authentication) = authentication {
-            let authorization = match authentication {
-                Authentication::Basic(authorization) => format!("Basic {authorization}"),
-                Authentication::Bearer(bearer) => format!("Bearer {}", bearer.access_token),
-            };
-
-            request = request.header("Authorization", authorization);
+            request = request.header("Authorization", authentication.to_authorization_header());
         }
 
-        let request = request.body(Body::empty()).unwrap();
+        let request = request.body(Body::empty()).map_err(ApiError::Http)?;
 
         let response = self.client.send(request).await.unwrap();
 

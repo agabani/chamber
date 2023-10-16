@@ -24,6 +24,17 @@ pub enum Authentication {
     Bearer(Bearer),
 }
 
+impl Authentication {
+    ///
+    #[must_use]
+    pub fn to_authorization_header(&self) -> String {
+        match self {
+            Authentication::Basic(token) => format!("Basic {token}"),
+            Authentication::Bearer(bearer) => format!("Bearer {}", bearer.access_token),
+        }
+    }
+}
+
 /// Solves authentication challenges
 pub trait Solver {
     /// Solves a [`Challenge`].

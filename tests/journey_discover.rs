@@ -87,6 +87,7 @@ async fn run(base_url: String) {
         }
     };
 
+    println!("{catalog_response:?}");
     println!("{authentication:?}");
     println!("");
 
@@ -126,6 +127,7 @@ async fn run(base_url: String) {
         }
     };
 
+    println!("{tags_list_response:?}");
     println!("{authentication:?}");
     println!("");
 }

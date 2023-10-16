@@ -1,7 +1,9 @@
 use hyper::{Body, Method, Request, Response, StatusCode};
+use url::Url;
 
 use crate::{
     distribution::{
+        api::ApiError,
         authentication::Authentication,
         client::Client,
         spec::{CatalogResponseBody, ErrorResponseBody},
@@ -26,21 +28,16 @@ impl Catalog {
         &self,
         request: &CatalogRequest,
         authentication: Option<&Authentication>,
-    ) -> Result<CatalogResponse> {
-        let mut request = Request::builder()
-            .method(Method::GET)
-            .uri(format!("{}/v2/_catalog", request.base_url));
+    ) -> Result<CatalogResponse, ApiError> {
+        let mut url = Url::parse(&request.base_url).map_err(ApiError::Parse)?;
+        url.set_path("/v2/_catalog");
 
+        let mut request = Request::builder().method(Method::GET).uri(url.to_string());
         if let Some(authentication) = authentication {
-            let authorization = match authentication {
-                Authentication::Basic(authorization) => format!("Basic {authorization}"),
-                Authentication::Bearer(bearer) => format!("Bearer {}", bearer.access_token),
-            };
-
-            request = request.header("Authorization", authorization);
+            request = request.header("Authorization", authentication.to_authorization_header());
         }
 
-        let request = request.body(Body::empty()).unwrap();
+        let request = request.body(Body::empty()).map_err(ApiError::Http)?;
 
         let response = self.client.send(request).await.unwrap();
 

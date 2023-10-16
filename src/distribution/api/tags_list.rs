@@ -2,7 +2,7 @@ use hyper::{Body, Method, Request, Response, StatusCode};
 use url::Url;
 
 use crate::{
-    distribution::{authentication::Authentication, client::Client, spec, utils},
+    distribution::{api::ApiError, authentication::Authentication, client::Client, spec, utils},
     Result,
 };
 
@@ -22,22 +22,16 @@ impl TagsList {
         &self,
         request: &TagsListRequest,
         authentication: Option<&Authentication>,
-    ) -> Result<TagsListResponse> {
-        let mut url = Url::parse(&request.base_url).unwrap();
+    ) -> Result<TagsListResponse, ApiError> {
+        let mut url = Url::parse(&request.base_url).map_err(ApiError::Parse)?;
         url.set_path(&format!("/v2/{}/tags/list", request.repository));
 
         let mut request = Request::builder().method(Method::GET).uri(url.to_string());
-
         if let Some(authentication) = authentication {
-            let authorization = match authentication {
-                Authentication::Basic(authorization) => format!("Basic {authorization}"),
-                Authentication::Bearer(bearer) => format!("Bearer {}", bearer.access_token),
-            };
-
-            request = request.header("Authorization", authorization);
+            request = request.header("Authorization", authentication.to_authorization_header());
         }
 
-        let request = request.body(Body::empty()).unwrap();
+        let request = request.body(Body::empty()).map_err(ApiError::Http)?;
 
         let response = self.client.send(request).await.unwrap();
 

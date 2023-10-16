@@ -2,13 +2,13 @@ use std::borrow::Cow;
 
 use hyper::{body::HttpBody, Body, Response, StatusCode};
 
-use crate::{parser::www_authenticate::WwwAuthenticate, Result};
-
-use super::{
-    api::{
-        self, Catalog, CatalogRequest, CatalogResponse, Support, SupportRequest, SupportResponse,
+use crate::{
+    distribution::{
+        api,
+        authentication::{Authentication, Credential, Solvers},
     },
-    authentication::{Authentication, Credential, Solvers},
+    parser::www_authenticate::WwwAuthenticate,
+    Result,
 };
 
 ///
@@ -35,12 +35,12 @@ where
 
 ///
 pub async fn catalog<'a>(
-    api: &Catalog,
+    api: &api::Catalog,
     solvers: &Solvers,
     credential: Option<&Credential>,
     authentication: Cow<'a, Option<Authentication>>,
-    request: &CatalogRequest,
-) -> Result<(CatalogResponse, Cow<'a, Option<Authentication>>)> {
+    request: &api::CatalogRequest,
+) -> Result<(api::CatalogResponse, Cow<'a, Option<Authentication>>), api::ApiError> {
     let mut response = api.send(request, authentication.as_ref().as_ref()).await?;
 
     if response.raw.status() != StatusCode::UNAUTHORIZED {
@@ -78,12 +78,12 @@ pub async fn catalog<'a>(
 
 ///
 pub async fn support<'a>(
-    api: &Support,
+    api: &api::Support,
     solvers: &Solvers,
     credential: Option<&Credential>,
     authentication: Cow<'a, Option<Authentication>>,
-    request: &SupportRequest,
-) -> Result<(SupportResponse, Cow<'a, Option<Authentication>>)> {
+    request: &api::SupportRequest,
+) -> Result<(api::SupportResponse, Cow<'a, Option<Authentication>>), api::ApiError> {
     let mut response = api.send(request, authentication.as_ref().as_ref()).await?;
 
     if response.raw.status() != StatusCode::UNAUTHORIZED {
@@ -126,7 +126,7 @@ pub async fn tags_list<'a>(
     credential: Option<&Credential>,
     authentication: Cow<'a, Option<Authentication>>,
     request: &api::TagsListRequest,
-) -> Result<(api::TagsListResponse, Cow<'a, Option<Authentication>>)> {
+) -> Result<(api::TagsListResponse, Cow<'a, Option<Authentication>>), api::ApiError> {
     let mut response = api.send(request, authentication.as_ref().as_ref()).await?;
 
     if response.raw.status() != StatusCode::UNAUTHORIZED {
