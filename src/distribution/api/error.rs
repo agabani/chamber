@@ -2,10 +2,16 @@
 #[derive(Debug)]
 pub enum ApiError {
     ///
+    Header(hyper::header::ToStrError),
+
+    ///
     Http(hyper::http::Error),
 
     ///
     Parse(url::ParseError),
+
+    ///
+    Protocol,
 }
 
 impl std::fmt::Display for ApiError {
