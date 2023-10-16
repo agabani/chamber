@@ -5,18 +5,18 @@ use hyper::StatusCode;
 use crate::{parser::www_authenticate::WwwAuthenticate, Result};
 
 use super::{
-    api::{Support, SupportRequest, SupportResponse},
+    api::{Catalog, CatalogRequest, CatalogResponse},
     authentication::{Authentication, Credential, Solvers},
 };
 
 ///
 pub async fn support<'a>(
-    api: &Support,
+    api: &Catalog,
     solvers: &Solvers,
     credential: Option<&Credential>,
     authentication: Cow<'a, Option<Authentication>>,
-    request: &SupportRequest,
-) -> Result<(SupportResponse, Cow<'a, Option<Authentication>>)> {
+    request: &CatalogRequest,
+) -> Result<(CatalogResponse, Cow<'a, Option<Authentication>>)> {
     let mut response = api.send(request, authentication.as_ref().as_ref()).await?;
 
     if response.raw.status() != StatusCode::UNAUTHORIZED {

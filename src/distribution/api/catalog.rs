@@ -2,14 +2,14 @@ use hyper::{Body, Method, Request, Response};
 
 use crate::Result;
 
-use super::{authentication::Authentication, client::Client};
+use super::super::{authentication::Authentication, client::Client};
 
 ///
-pub struct Support {
+pub struct Catalog {
     client: Client,
 }
 
-impl Support {
+impl Catalog {
     ///
     pub fn new(client: Client) -> Self {
         Self { client }
@@ -18,12 +18,12 @@ impl Support {
     ///
     pub async fn send(
         &self,
-        request: &SupportRequest,
+        request: &CatalogRequest,
         authentication: Option<&Authentication>,
-    ) -> Result<SupportResponse> {
+    ) -> Result<CatalogResponse> {
         let mut request = Request::builder()
             .method(Method::GET)
-            .uri(format!("{}/v2/", request.base_url));
+            .uri(format!("{}/v2/_catalog", request.base_url));
 
         if let Some(authentication) = authentication {
             let authorization = match authentication {
@@ -38,18 +38,18 @@ impl Support {
 
         let response = self.client.send(request).await.unwrap();
 
-        Ok(SupportResponse { raw: response })
+        Ok(CatalogResponse { raw: response })
     }
 }
 
 ///
-pub struct SupportRequest {
+pub struct CatalogRequest {
     ///
     pub base_url: String,
 }
 
 ///
-pub struct SupportResponse {
+pub struct CatalogResponse {
     ///
     pub raw: Response<Body>,
 }

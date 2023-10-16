@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use chamber::distribution::{
-    api::{Support, SupportRequest},
+    api::{Catalog, CatalogRequest},
     authentication::{Credential, Solvers},
     client::Client,
     utils::support,
@@ -26,10 +26,10 @@ async fn bearer() {
 async fn run(base_url: String) {
     // Arrange
     let client = Client::new(hyper::Client::new());
-    let api = Support::new(client.clone());
+    let api = Catalog::new(client.clone());
     let solvers = Solvers::all(client);
     let credential = Credential::UsernamePassword("admin".to_string(), "password".to_string());
-    let request = SupportRequest { base_url };
+    let request = CatalogRequest { base_url };
 
     // Act
     let (response, authentication) = support(
