@@ -2,14 +2,20 @@ use std::{future::Future, marker::PhantomData, pin::Pin, sync::Arc};
 
 use tower::ServiceExt as _;
 
-use crate::{distribution::error, service};
+use crate::{
+    distribution::error,
+    parser::www_authenticate::{self, WwwAuthenticate},
+    service,
+};
 
-use super::authentication::{Authentication, Solver};
+use super::authentication::{Authentication, Credential, Solver};
 
 ///
 pub trait Request {
     ///
     type Future: Future<Output = Result<hyper::Request<hyper::Body>, error::Error>>;
+
+    fn credential(&self) -> Option<&Credential>;
 
     ///
     fn to_http_request(&self) -> Self::Future;
@@ -25,6 +31,9 @@ where
 
     ///
     fn from_http_response(response: hyper::Response<hyper::Body>) -> Self::Future; // TODO: accept successful authentication used.
+
+    ///
+    fn www_authenticate(&self) -> Result<Option<WwwAuthenticate>, error::Error>;
 }
 
 ///
@@ -88,16 +97,29 @@ where
             let response = client
                 .ready()
                 .await
-                .map_err(Into::into)
-                .expect("TODO: Self::Error")
+                .map_err(Into::into)?
                 .call(http_request)
                 .await
-                .map_err(Into::into)
-                .expect("TODO: Self::Error");
+                .map_err(Into::into)?;
 
             let response = Response::from_http_response(response).await?;
 
-            // TODO: repeat request with new authentication if required
+            let Some(www_authenticate) = response.www_authenticate()? else {
+                return Ok(response);
+            };
+
+            let Some(credential) = request.credential() else {
+                return Ok(response);
+            };
+
+            for challenge in www_authenticate.challenges {
+                for solver in &solvers {
+                    if let Some(authentication) = solver.solve(&challenge, credential).await? {
+                        // ? how to add authentication ?
+                        let http_request = request.to_http_request().await?;
+                    }
+                }
+            }
 
             Ok(response)
         };
