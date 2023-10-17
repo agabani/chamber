@@ -12,5 +12,5 @@ pub trait Service<Request> {
     type Future: Future<Output = Result<Self::Response, Self::Error>>;
 
     ///
-    fn send(&self, request: &Request) -> Self::Future;
+    fn call(&self, request: Request) -> Self::Future;
 }
