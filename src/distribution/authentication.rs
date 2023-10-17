@@ -61,8 +61,15 @@ impl Solver for BasicSolver {
 
 impl BasicSolver {
     ///
+    #[must_use]
     pub fn new() -> Self {
         Self
+    }
+}
+
+impl Default for BasicSolver {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -79,6 +86,7 @@ where
     S: tower::Service<hyper::Request<hyper::Body>, Response = hyper::Response<hyper::Body>>,
 {
     ///
+    #[must_use]
     pub fn new(client: S) -> Self {
         Self { client }
     }

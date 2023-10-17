@@ -1,20 +1,10 @@
 use std::{future::Future, marker::PhantomData, pin::Pin, sync::Arc};
 
-use tower::{Service as _, ServiceExt as _};
+use tower::ServiceExt as _;
 
 use crate::{distribution::error, service};
 
 use super::authentication::{Authentication, Solver};
-
-///
-pub type Client = tower::buffer::Buffer<
-    tower::util::BoxService<
-        hyper::Request<hyper::Body>,
-        hyper::Response<hyper::Body>,
-        tower::BoxError, // TODO: find a way to remove the boxed error...
-    >,
-    hyper::Request<hyper::Body>,
->;
 
 ///
 pub trait Request {
@@ -38,8 +28,12 @@ where
 }
 
 ///
-pub struct Service<Request, Response>
+pub struct Service<Client, Request, Response>
 where
+    Client: tower::Service<hyper::Request<hyper::Body>, Response = hyper::Response<hyper::Body>>
+        + Clone
+        + 'static,
+    Client::Error: Into<error::Error>,
     Request: self::Request,
     Response: self::Response,
 {
@@ -49,8 +43,12 @@ where
     _response: PhantomData<Response>,
 }
 
-impl<Request, Response> Service<Request, Response>
+impl<Client, Request, Response> Service<Client, Request, Response>
 where
+    Client: tower::Service<hyper::Request<hyper::Body>, Response = hyper::Response<hyper::Body>>
+        + Clone
+        + 'static,
+    Client::Error: Into<error::Error>,
     Request: self::Request,
     Response: self::Response,
 {
@@ -65,8 +63,12 @@ where
     }
 }
 
-impl<Request, Response> service::Service<Request> for Service<Request, Response>
+impl<Client, Request, Response> service::Service<Request> for Service<Client, Request, Response>
 where
+    Client: tower::Service<hyper::Request<hyper::Body>, Response = hyper::Response<hyper::Body>>
+        + Clone
+        + 'static,
+    Client::Error: Into<error::Error>,
     Request: self::Request + 'static, // TODO: find a way to remove static...
     Response: self::Response,
 {
@@ -86,9 +88,11 @@ where
             let response = client
                 .ready()
                 .await
+                .map_err(Into::into)
                 .expect("TODO: Self::Error")
                 .call(http_request)
                 .await
+                .map_err(Into::into)
                 .expect("TODO: Self::Error");
 
             let response = Response::from_http_response(response).await?;
