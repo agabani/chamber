@@ -1,8 +1,10 @@
-use std::{future::Future, marker::PhantomData, pin::Pin};
+use std::{future::Future, marker::PhantomData, pin::Pin, sync::Arc};
 
 use tower::{Service as _, ServiceExt as _};
 
 use crate::{distribution::error, service};
+
+use super::authentication::{Authentication, Solver};
 
 ///
 pub type Client = tower::buffer::Buffer<
@@ -42,6 +44,7 @@ where
     Response: self::Response,
 {
     client: Client,
+    solvers: Vec<Arc<dyn Solver>>,
     _request: PhantomData<Request>,
     _response: PhantomData<Response>,
 }
@@ -52,9 +55,10 @@ where
     Response: self::Response,
 {
     ///
-    pub fn new(client: Client) -> Self {
+    pub fn new(client: Client, solvers: Vec<Arc<dyn Solver>>) -> Self {
         Self {
             client,
+            solvers,
             _request: PhantomData,
             _response: PhantomData,
         }
@@ -74,6 +78,7 @@ where
 
     fn call(&self, request: Request) -> Self::Future {
         let mut client = self.client.clone();
+        let solvers = self.solvers.clone();
 
         let future = async move {
             let http_request = request.to_http_request().await?;
