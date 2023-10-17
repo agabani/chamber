@@ -1,45 +1,84 @@
 use std::{future::Future, marker::PhantomData, pin::Pin};
 
-use hyper::Body;
-use tower::{buffer::Buffer, util::BoxService, BoxError, Service, ServiceExt};
+use tower::{Service as _, ServiceExt as _};
 
 use crate::{distribution::error, service};
 
 ///
-pub type DistributionClient = Buffer<
-    BoxService<hyper::Request<hyper::Body>, hyper::Response<hyper::Body>, BoxError>, // TODO: find a way to remove the boxed error...
+pub type Client = tower::buffer::Buffer<
+    tower::util::BoxService<
+        hyper::Request<hyper::Body>,
+        hyper::Response<hyper::Body>,
+        tower::BoxError, // TODO: find a way to remove the boxed error...
+    >,
     hyper::Request<hyper::Body>,
 >;
 
 ///
-pub struct DistributionService<Request, Response>
+pub trait Request {
+    ///
+    type Future: Future<Output = Result<hyper::Request<hyper::Body>, error::Error>>;
+
+    ///
+    fn to_http_request(&self) -> Self::Future;
+}
+
+///
+pub trait Response
 where
-    Request: DistributionRequest,
-    Response: DistributionResponse,
+    Self: Sized,
 {
-    inner: DistributionClient,
+    ///
+    type Future: Future<Output = Result<Self, error::Error>>;
+
+    ///
+    fn from_http_response(response: hyper::Response<hyper::Body>) -> Self::Future; // TODO: accept successful authentication used.
+}
+
+///
+pub struct Service<Request, Response>
+where
+    Request: self::Request,
+    Response: self::Response,
+{
+    client: Client,
     _request: PhantomData<Request>,
     _response: PhantomData<Response>,
 }
 
-impl<Request, Response> service::Service<Request> for DistributionService<Request, Response>
+impl<Request, Response> Service<Request, Response>
 where
-    Request: DistributionRequest + 'static, // TODO: find a way to remove static...
-    Response: DistributionResponse,
+    Request: self::Request,
+    Response: self::Response,
+{
+    ///
+    pub fn new(client: Client) -> Self {
+        Self {
+            client,
+            _request: PhantomData,
+            _response: PhantomData,
+        }
+    }
+}
+
+impl<Request, Response> service::Service<Request> for Service<Request, Response>
+where
+    Request: self::Request + 'static, // TODO: find a way to remove static...
+    Response: self::Response,
 {
     type Response = Response;
 
-    type Error = error::DistributionError;
+    type Error = error::Error;
 
     type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>>>>;
 
     fn call(&self, request: Request) -> Self::Future {
-        let mut inner = self.inner.clone();
+        let mut client = self.client.clone();
 
         let future = async move {
             let http_request = request.to_http_request().await?;
 
-            let response = inner
+            let response = client
                 .ready()
                 .await
                 .expect("TODO: Self::Error")
@@ -56,25 +95,4 @@ where
 
         Box::pin(future)
     }
-}
-
-///
-pub trait DistributionRequest {
-    ///
-    type Future: Future<Output = Result<hyper::Request<hyper::Body>, error::DistributionError>>;
-
-    ///
-    fn to_http_request(&self) -> Self::Future;
-}
-
-///
-pub trait DistributionResponse
-where
-    Self: Sized,
-{
-    ///
-    type Future: Future<Output = Result<Self, error::DistributionError>>;
-
-    ///
-    fn from_http_response(response: hyper::Response<Body>) -> Self::Future; // TODO: accept successful authentication used.
 }
