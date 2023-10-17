@@ -37,7 +37,9 @@ where
         let mut inner = self.inner.clone();
 
         let future = async move {
-            let http_request = request.to_http_request().await?;
+            let (builder, body) = request.to_http_request().await?;
+
+            let http_request = builder.body(body).expect("TODO: Self::Error");
 
             let response = inner
                 .ready()
@@ -47,9 +49,11 @@ where
                 .await
                 .expect("TODO: Self::Error");
 
-            let response = Response::from_http_response(response).await;
+            let response = Response::from_http_response(response).await?;
 
-            response
+            // TODO: repeat request with new authentication if required
+
+            Ok(response)
         };
 
         Box::pin(future)
@@ -59,10 +63,15 @@ where
 ///
 pub trait DistributionRequest {
     ///
-    type Future: Future<Output = Result<hyper::Request<hyper::Body>, error::DistributionError>>;
+    type Future: Future<
+        Output = Result<(hyper::http::request::Builder, hyper::Body), error::DistributionError>,
+    >;
 
     ///
     fn to_http_request(&self) -> Self::Future;
+
+    ///
+    fn with_authentication(&self) -> Self;
 }
 
 ///
@@ -74,5 +83,5 @@ where
     type Future: Future<Output = Result<Self, error::DistributionError>>;
 
     ///
-    fn from_http_response(response: hyper::Response<Body>) -> Self::Future;
+    fn from_http_response(response: hyper::Response<Body>) -> Self::Future; // TODO: accept successful authentication used.
 }
