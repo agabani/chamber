@@ -2,19 +2,16 @@ use std::{future::Future, marker::PhantomData, pin::Pin, sync::Arc};
 
 use tower::ServiceExt as _;
 
-use crate::{
-    distribution::error,
-    parser::www_authenticate::{self, WwwAuthenticate},
-    service,
-};
+use crate::{distribution::error, parser::www_authenticate::WwwAuthenticate, service};
 
-use super::authentication::{Authentication, Credential, Solver};
+use super::authentication::{Credential, Solver};
 
 ///
 pub trait Request {
     ///
     type Future: Future<Output = Result<hyper::Request<hyper::Body>, error::Error>>;
 
+    ///
     fn credential(&self) -> Option<&Credential>;
 
     ///
