@@ -37,9 +37,7 @@ where
         let mut inner = self.inner.clone();
 
         let future = async move {
-            let (builder, body) = request.to_http_request().await?;
-
-            let http_request = builder.body(body).expect("TODO: Self::Error");
+            let http_request = request.to_http_request().await?;
 
             let response = inner
                 .ready()
@@ -63,15 +61,10 @@ where
 ///
 pub trait DistributionRequest {
     ///
-    type Future: Future<
-        Output = Result<(hyper::http::request::Builder, hyper::Body), error::DistributionError>,
-    >;
+    type Future: Future<Output = Result<hyper::Request<hyper::Body>, error::DistributionError>>;
 
     ///
     fn to_http_request(&self) -> Self::Future;
-
-    ///
-    fn with_authentication(&self) -> Self;
 }
 
 ///
