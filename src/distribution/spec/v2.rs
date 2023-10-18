@@ -52,6 +52,10 @@ pub struct ErrorResponseBodyErrorDetail {
 
 ///
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub struct SupportResponseBody {}
+
+///
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct TagsListResponseBody {
     ///
     pub name: String,

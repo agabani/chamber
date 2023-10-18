@@ -88,7 +88,7 @@ impl CatalogResponse {
     }
 
     ///
-    pub async fn to_json(self) -> Result<spec::v2::CatalogResponseBody, error::Error> {
+    pub async fn to_spec(self) -> Result<spec::v2::CatalogResponseBody, error::Error> {
         let body = self.http_response.into_body();
         let bytes = hyper::body::to_bytes(body).await?;
         let response = serde_json::from_slice(&bytes)?;
@@ -197,6 +197,14 @@ impl SupportResponse {
     ///
     pub fn raw(&self) -> &hyper::Response<hyper::Body> {
         &self.http_response
+    }
+
+    ///
+    pub async fn to_spec(self) -> Result<spec::v2::SupportResponseBody, error::Error> {
+        let body = self.http_response.into_body();
+        let bytes = hyper::body::to_bytes(body).await?;
+        let response = serde_json::from_slice(&bytes)?;
+        Ok(response)
     }
 }
 
@@ -307,7 +315,7 @@ impl TagsListResponse {
     }
 
     ///
-    pub async fn to_json(self) -> Result<spec::v2::TagsListResponseBody, error::Error> {
+    pub async fn to_spec(self) -> Result<spec::v2::TagsListResponseBody, error::Error> {
         let body = self.http_response.into_body();
         let bytes = hyper::body::to_bytes(body).await?;
         let response = serde_json::from_slice(&bytes)?;

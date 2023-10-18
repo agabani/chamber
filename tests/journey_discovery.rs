@@ -58,7 +58,8 @@ async fn run(base_url: &str) {
     // Assert
     assert_eq!(response.raw().status(), StatusCode::OK);
     let authentication = response.authentication().cloned();
-    println!("{:?} {:?}", authentication, response.raw());
+    let response = response.to_spec().await.unwrap();
+    println!("{:?} {:?}", authentication, response);
     println!("");
 
     // Arrange
@@ -77,7 +78,7 @@ async fn run(base_url: &str) {
     // Assert
     assert_eq!(response.raw().status(), StatusCode::OK);
     let authentication = response.authentication().cloned();
-    let response = response.to_json().await.unwrap();
+    let response = response.to_spec().await.unwrap();
     println!("{:?} {:?}", authentication, response);
     println!("");
 
@@ -98,7 +99,7 @@ async fn run(base_url: &str) {
     // Assert
     assert_eq!(response.raw().status(), StatusCode::OK);
     let authentication = response.authentication().cloned();
-    let response = response.to_json().await.unwrap();
+    let response = response.to_spec().await.unwrap();
     println!("{:?} {:?}", authentication, response);
     println!("");
 }
