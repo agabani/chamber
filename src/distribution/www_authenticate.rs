@@ -37,6 +37,10 @@ pub struct AuthParam<'a> {
 
 impl<'a> WwwAuthenticate<'a> {
     /// Parse a [`WwwAuthenticate`] from a string.
+    ///
+    /// # Errors
+    ///
+    /// Will return `Err` if Www-Authenticate header is unparsable.
     pub fn parse(input: &'a str) -> Result<Self, nom::Err<nom::error::Error<&'a str>>> {
         let (_, challenges) = all_consuming(challenges())(input)?;
 
