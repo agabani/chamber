@@ -2,10 +2,7 @@ use std::sync::Arc;
 
 use chamber::{
     distribution::{
-        api::v2::{
-            CatalogRequest, CatalogResponse, SupportRequest, SupportResponse, TagsListRequest,
-            TagsListResponse,
-        },
+        api::v2::{catalog, support, tags_list},
         authentication::{BasicSolver, BearerSolver, Credential, Solver, UsernamePassword},
         service::Service,
     },
@@ -44,9 +41,9 @@ async fn run(base_url: &str) {
 
     // Arrange - Support
     let service =
-        Service::<_, SupportRequest, SupportResponse>::new(client.clone(), solvers.clone());
+        Service::<_, support::Request, support::Response>::new(client.clone(), solvers.clone());
 
-    let request = SupportRequest::new(
+    let request = support::Request::new(
         Url::parse(base_url).unwrap(),
         authentication,
         Some(credential.clone()),
@@ -64,9 +61,9 @@ async fn run(base_url: &str) {
 
     // Arrange - Catalog
     let service =
-        Service::<_, CatalogRequest, CatalogResponse>::new(client.clone(), solvers.clone());
+        Service::<_, catalog::Request, catalog::Response>::new(client.clone(), solvers.clone());
 
-    let request = CatalogRequest::new(
+    let request = catalog::Request::new(
         Url::parse(base_url).unwrap(),
         authentication,
         Some(credential.clone()),
@@ -84,9 +81,9 @@ async fn run(base_url: &str) {
 
     // Arrange - TagsList
     let service =
-        Service::<_, TagsListRequest, TagsListResponse>::new(client.clone(), solvers.clone());
+        Service::<_, tags_list::Request, tags_list::Response>::new(client.clone(), solvers.clone());
 
-    let request = TagsListRequest::new(
+    let request = tags_list::Request::new(
         Url::parse(base_url).unwrap(),
         response.repositories.first().unwrap().clone(),
         authentication,
@@ -105,9 +102,9 @@ async fn run(base_url: &str) {
 
     // Arrange - TagsList Not Found
     let service =
-        Service::<_, TagsListRequest, TagsListResponse>::new(client.clone(), solvers.clone());
+        Service::<_, tags_list::Request, tags_list::Response>::new(client.clone(), solvers.clone());
 
-    let request = TagsListRequest::new(
+    let request = tags_list::Request::new(
         Url::parse(base_url).unwrap(),
         "not_found".to_string(),
         authentication,
