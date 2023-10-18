@@ -9,8 +9,14 @@ pub enum Error {
     Http(hyper::http::Error),
     /// Hyper.
     Hyper(hyper::Error),
+    /// Json.
+    Json(serde_json::Error),
     /// Nom.
     Nom(String),
+    /// Protocol.
+    Protocol(String),
+    /// Url.
+    Url(url::ParseError),
 }
 
 impl fmt::Display for Error {
@@ -39,8 +45,20 @@ impl From<hyper::header::ToStrError> for Error {
     }
 }
 
-impl<'a> From<nom::Err<nom::error::Error<&'a str>>> for Error {
-    fn from(value: nom::Err<nom::error::Error<&'a str>>) -> Self {
+impl From<serde_json::Error> for Error {
+    fn from(value: serde_json::Error) -> Self {
+        Self::Json(value)
+    }
+}
+
+impl From<nom::Err<nom::error::Error<&str>>> for Error {
+    fn from(value: nom::Err<nom::error::Error<&str>>) -> Self {
         Self::Nom(value.to_string())
+    }
+}
+
+impl From<url::ParseError> for Error {
+    fn from(value: url::ParseError) -> Self {
+        Self::Url(value)
     }
 }

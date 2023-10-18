@@ -58,7 +58,10 @@ impl Request for SupportRequest {
                 Authentication::Basic(token) => {
                     request = request.header("Authorization", format!("Basic {token}"));
                 }
-                Authentication::Bearer(_) => todo!(),
+                Authentication::Bearer(bearer) => {
+                    request =
+                        request.header("Authorization", format!("Bearer {}", bearer.access_token));
+                }
             }
         }
 
