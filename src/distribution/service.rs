@@ -31,6 +31,15 @@ impl<Client> Service<Client, super::api::v2::catalog::Request, super::api::v2::c
     }
 }
 
+impl<Client>
+    Service<Client, super::api::v2::manifests_get::Request, super::api::v2::manifests_get::Response>
+{
+    ///
+    pub fn v2_manifests_get(client: Client, solvers: Vec<Arc<dyn Solver>>) -> Self {
+        Self::new(client, solvers)
+    }
+}
+
 impl<Client> Service<Client, super::api::v2::support::Request, super::api::v2::support::Response> {
     ///
     pub fn v2_support(client: Client, solvers: Vec<Arc<dyn Solver>>) -> Self {
