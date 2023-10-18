@@ -4,7 +4,7 @@ use base64::Engine;
 use hyper::StatusCode;
 use tower::ServiceExt;
 
-use crate::{distribution::error, parser::www_authenticate::Challenge};
+use crate::distribution::{error, www_authenticate::Challenge};
 
 ///
 #[derive(Debug, Clone)]

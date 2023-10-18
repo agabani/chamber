@@ -1,13 +1,11 @@
 use std::{future::Future, pin::Pin};
 
-use crate::{
-    distribution::{
-        authentication::{Authentication, Credential},
-        error,
-        service::{Request, Response},
-        spec,
-    },
-    parser::www_authenticate::WwwAuthenticate,
+use crate::distribution::{
+    authentication::{Authentication, Credential},
+    error,
+    service::{Request, Response},
+    spec,
+    www_authenticate::WwwAuthenticate,
 };
 
 ///

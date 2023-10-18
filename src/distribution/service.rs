@@ -2,7 +2,10 @@ use std::{future::Future, marker::PhantomData, pin::Pin, sync::Arc};
 
 use tower::ServiceExt as _;
 
-use crate::{distribution::error, parser::www_authenticate::WwwAuthenticate, service};
+use crate::{
+    distribution::{error, www_authenticate::WwwAuthenticate},
+    service,
+};
 
 use super::authentication::{Authentication, Credential, Solver};
 

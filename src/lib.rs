@@ -6,6 +6,4 @@
 ///
 pub mod distribution;
 ///
-pub mod parser;
-///
 pub mod service;
