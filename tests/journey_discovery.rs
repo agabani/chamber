@@ -42,7 +42,7 @@ async fn run(base_url: &str) {
         Arc::new(BearerSolver::new(client.clone())),
     ];
 
-    // Arrange
+    // Arrange - Support
     let service =
         Service::<_, SupportRequest, SupportResponse>::new(client.clone(), solvers.clone());
 
@@ -52,17 +52,17 @@ async fn run(base_url: &str) {
         Some(credential.clone()),
     );
 
-    // Act
+    // Act - Support
     let response = service.call(request).await.expect("failed to send request");
 
-    // Assert
+    // Assert - Support
     assert_eq!(response.raw().status(), StatusCode::OK);
     let authentication = response.authentication().cloned();
     let response = response.to_spec().await.unwrap();
     println!("{:?} {:?}", authentication, response);
     println!("");
 
-    // Arrange
+    // Arrange - Catalog
     let service =
         Service::<_, CatalogRequest, CatalogResponse>::new(client.clone(), solvers.clone());
 
@@ -72,17 +72,17 @@ async fn run(base_url: &str) {
         Some(credential.clone()),
     );
 
-    // Act
+    // Act - Catalog
     let response = service.call(request).await.expect("failed to send request");
 
-    // Assert
+    // Assert - Catalog
     assert_eq!(response.raw().status(), StatusCode::OK);
     let authentication = response.authentication().cloned();
     let response = response.to_spec().await.unwrap();
     println!("{:?} {:?}", authentication, response);
     println!("");
 
-    // Arrange
+    // Arrange - TagsList
     let service =
         Service::<_, TagsListRequest, TagsListResponse>::new(client.clone(), solvers.clone());
 
@@ -93,11 +93,32 @@ async fn run(base_url: &str) {
         Some(credential.clone()),
     );
 
-    // Act
+    // Act - TagsList
     let response = service.call(request).await.expect("failed to send request");
 
-    // Assert
+    // Assert - TagsList
     assert_eq!(response.raw().status(), StatusCode::OK);
+    let authentication = response.authentication().cloned();
+    let response = response.to_spec().await.unwrap();
+    println!("{:?} {:?}", authentication, response);
+    println!("");
+
+    // Arrange - TagsList Not Found
+    let service =
+        Service::<_, TagsListRequest, TagsListResponse>::new(client.clone(), solvers.clone());
+
+    let request = TagsListRequest::new(
+        Url::parse(base_url).unwrap(),
+        "not_found".to_string(),
+        authentication,
+        Some(credential.clone()),
+    );
+
+    // Act - TagsList Not Found
+    let response = service.call(request).await.expect("failed to send request");
+
+    // Assert - TagsList Not Found
+    assert_eq!(response.raw().status(), StatusCode::NOT_FOUND);
     let authentication = response.authentication().cloned();
     let response = response.to_spec().await.unwrap();
     println!("{:?} {:?}", authentication, response);

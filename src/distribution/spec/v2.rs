@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 ///
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct CatalogResponseBody {
@@ -23,7 +25,7 @@ pub struct ErrorResponseBodyError {
 
     ///
     #[serde(rename = "detail")]
-    pub detail: Vec<ErrorResponseBodyErrorDetail>,
+    pub detail: ErrorResponseBodyErrorDetail,
 
     ///
     #[serde(rename = "message")]
@@ -32,22 +34,12 @@ pub struct ErrorResponseBodyError {
 
 ///
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
-pub struct ErrorResponseBodyErrorDetail {
+#[serde(untagged)]
+pub enum ErrorResponseBodyErrorDetail {
     ///
-    #[serde(rename = "Action")]
-    pub action: String,
-
+    Array(Vec<HashMap<String, String>>),
     ///
-    #[serde(rename = "Class")]
-    pub class: String,
-
-    ///
-    #[serde(rename = "Type")]
-    pub type_: String,
-
-    ///
-    #[serde(rename = "Name")]
-    pub name: String,
+    Object(HashMap<String, String>),
 }
 
 ///

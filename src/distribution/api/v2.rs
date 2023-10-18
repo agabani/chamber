@@ -1,5 +1,7 @@
 use std::{future::Future, pin::Pin};
 
+use hyper::StatusCode;
+
 use crate::distribution::{
     authentication::{Authentication, Credential},
     error,
@@ -315,10 +317,16 @@ impl TagsListResponse {
     }
 
     ///
-    pub async fn to_spec(self) -> Result<spec::v2::TagsListResponseBody, error::Error> {
+    pub async fn to_spec(self) -> Result<TagsListResponseBody, error::Error> {
+        let status_code = self.http_response.status();
         let body = self.http_response.into_body();
         let bytes = hyper::body::to_bytes(body).await?;
-        let response = serde_json::from_slice(&bytes)?;
+
+        let response = match status_code {
+            StatusCode::OK => TagsListResponseBody::Ok(serde_json::from_slice(&bytes)?),
+            StatusCode::NOT_FOUND => TagsListResponseBody::Error(serde_json::from_slice(&bytes)?),
+            status_code => todo!("{status_code}"),
+        };
         Ok(response)
     }
 }
@@ -345,4 +353,13 @@ impl Response for TagsListResponse {
         let www_authenticate = WwwAuthenticate::parse(value)?;
         Ok(Some(www_authenticate))
     }
+}
+
+///
+#[derive(Debug)]
+pub enum TagsListResponseBody {
+    ///
+    Ok(spec::v2::TagsListResponseBody),
+    ///
+    Error(spec::v2::ErrorResponseBody),
 }
