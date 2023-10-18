@@ -2,47 +2,9 @@ use std::{future::Future, marker::PhantomData, pin::Pin, sync::Arc};
 
 use tower::ServiceExt as _;
 
-use crate::{
-    distribution::{error, www_authenticate::WwwAuthenticate},
-    service,
-};
+use crate::distribution::error;
 
-use super::authentication::{Authentication, Credential, Solver};
-
-///
-pub trait Request {
-    ///
-    type Future: Future<Output = Result<hyper::Request<hyper::Body>, error::Error>>;
-
-    ///
-    fn authentication(&self) -> Option<&Authentication>;
-
-    ///
-    fn credential(&self) -> Option<&Credential>;
-
-    ///
-    fn to_http_request(&self, authentication: Option<&Authentication>) -> Self::Future;
-}
-
-///
-pub trait Response
-where
-    Self: Sized,
-{
-    ///
-    type Future: Future<Output = Result<Self, error::Error>>;
-
-    ///
-    fn new(
-        http_response: hyper::Response<hyper::Body>,
-        authentication: Option<Authentication>,
-    ) -> Self::Future;
-
-    /// # Errors
-    ///
-    /// Will return `Err` if Www-Authenticate header is unparsable.
-    fn www_authenticate(&self) -> Result<Option<WwwAuthenticate>, error::Error>;
-}
+use super::authentication::Solver;
 
 ///
 pub struct Service<Client, Request, Response>
@@ -51,8 +13,8 @@ where
         + Clone
         + 'static,
     Client::Error: Into<error::Error>,
-    Request: self::Request,
-    Response: self::Response,
+    Request: super::Request,
+    Response: super::Response,
 {
     client: Client,
     solvers: Vec<Arc<dyn Solver>>,
@@ -66,8 +28,8 @@ where
         + Clone
         + 'static,
     Client::Error: Into<error::Error>,
-    Request: self::Request,
-    Response: self::Response,
+    Request: super::Request,
+    Response: super::Response,
 {
     ///
     pub fn new(client: Client, solvers: Vec<Arc<dyn Solver>>) -> Self {
@@ -80,14 +42,15 @@ where
     }
 }
 
-impl<Client, Request, Response> service::Service<Request> for Service<Client, Request, Response>
+impl<Client, Request, Response> crate::service::Service<Request>
+    for Service<Client, Request, Response>
 where
     Client: tower::Service<hyper::Request<hyper::Body>, Response = hyper::Response<hyper::Body>>
         + Clone
         + 'static,
     Client::Error: Into<error::Error>,
-    Request: self::Request + 'static, // TODO: find a way to remove static...
-    Response: self::Response,
+    Request: super::Request + 'static, // TODO: find a way to remove static...
+    Response: super::Response,
 {
     type Response = Response;
 

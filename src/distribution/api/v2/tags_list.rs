@@ -3,8 +3,9 @@ use std::{future::Future, pin::Pin};
 use hyper::StatusCode;
 
 use crate::distribution::{
+    self,
     authentication::{Authentication, Credential},
-    error, service, spec,
+    error, spec,
     www_authenticate::WwwAuthenticate,
 };
 
@@ -34,7 +35,7 @@ impl Request {
     }
 }
 
-impl service::Request for Request {
+impl distribution::Request for Request {
     type Future = Pin<Box<dyn Future<Output = Result<hyper::Request<hyper::Body>, error::Error>>>>;
 
     fn authentication(&self) -> Option<&Authentication> {
@@ -106,7 +107,7 @@ impl Response {
     }
 }
 
-impl service::Response for Response {
+impl distribution::Response for Response {
     type Future = Pin<Box<dyn Future<Output = Result<Self, error::Error>>>>;
 
     fn new(
