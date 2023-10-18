@@ -3,6 +3,7 @@ use std::{future::Future, pin::Pin};
 use crate::{distribution::error, parser::www_authenticate::Challenge};
 
 ///
+#[derive(Clone)]
 pub enum Authentication {
     ///
     Basic(String),
@@ -11,6 +12,7 @@ pub enum Authentication {
 }
 
 ///
+#[derive(Clone)]
 pub struct Bearer {
     ///
     pub access_token: String,
@@ -50,8 +52,8 @@ pub struct BasicSolver;
 impl Solver for BasicSolver {
     fn solve(
         &self,
-        challenge: &Challenge,
-        credential: &Credential,
+        _challenge: &Challenge,
+        _credential: &Credential,
     ) -> Pin<Box<dyn Future<Output = Result<Option<Authentication>, error::Error>>>> {
         let future = async move { Ok(None) };
 
@@ -78,7 +80,7 @@ pub struct BearerSolver<S>
 where
     S: tower::Service<hyper::Request<hyper::Body>, Response = hyper::Response<hyper::Body>>,
 {
-    client: S,
+    _client: S,
 }
 
 impl<S> BearerSolver<S>
@@ -88,7 +90,7 @@ where
     ///
     #[must_use]
     pub fn new(client: S) -> Self {
-        Self { client }
+        Self { _client: client }
     }
 }
 
@@ -98,8 +100,8 @@ where
 {
     fn solve(
         &self,
-        challenge: &Challenge,
-        credential: &Credential,
+        _challenge: &Challenge,
+        _credential: &Credential,
     ) -> Pin<Box<dyn Future<Output = Result<Option<Authentication>, error::Error>>>> {
         let future = async move { Ok(None) };
 

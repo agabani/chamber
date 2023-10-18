@@ -4,12 +4,15 @@ use tower::ServiceExt as _;
 
 use crate::{distribution::error, parser::www_authenticate::WwwAuthenticate, service};
 
-use super::authentication::{Credential, Solver};
+use super::authentication::{Authentication, Credential, Solver};
 
 ///
 pub trait Request {
     ///
     type Future: Future<Output = Result<hyper::Request<hyper::Body>, error::Error>>;
+
+    ///
+    fn authentication(&self) -> Option<&Authentication>;
 
     ///
     fn credential(&self) -> Option<&Credential>;
@@ -27,9 +30,14 @@ where
     type Future: Future<Output = Result<Self, error::Error>>;
 
     ///
-    fn from_http_response(response: hyper::Response<hyper::Body>) -> Self::Future; // TODO: accept successful authentication used.
+    fn new(
+        http_response: hyper::Response<hyper::Body>,
+        authentication: Option<Authentication>,
+    ) -> Self::Future;
 
+    /// # Errors
     ///
+    /// Will return `Err` if Www-Authenticate header is unparsable.
     fn www_authenticate(&self) -> Result<Option<WwwAuthenticate>, error::Error>;
 }
 
@@ -91,7 +99,7 @@ where
         let future = async move {
             let http_request = request.to_http_request().await?;
 
-            let response = client
+            let http_response = client
                 .ready()
                 .await
                 .map_err(Into::into)?
@@ -99,7 +107,7 @@ where
                 .await
                 .map_err(Into::into)?;
 
-            let response = Response::from_http_response(response).await?;
+            let response = Response::new(http_response, request.authentication().cloned()).await?;
 
             let Some(www_authenticate) = response.www_authenticate()? else {
                 return Ok(response);
@@ -112,8 +120,21 @@ where
             for challenge in www_authenticate.challenges {
                 for solver in &solvers {
                     if let Some(authentication) = solver.solve(&challenge, credential).await? {
-                        // ? how to add authentication ?
                         let http_request = request.to_http_request().await?;
+
+                        let http_response = client
+                            .ready()
+                            .await
+                            .map_err(Into::into)?
+                            .call(http_request)
+                            .await
+                            .map_err(Into::into)?;
+
+                        let response = Response::new(http_response, Some(authentication)).await?;
+
+                        if response.www_authenticate()?.is_none() {
+                            return Ok(response);
+                        }
                     }
                 }
             }
