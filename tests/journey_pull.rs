@@ -39,7 +39,7 @@ async fn run(base_url: &str) {
         Arc::new(BearerSolver::new(client.clone())),
     ];
 
-    // Arrange - Manifest Get
+    // Arrange - Manifest Get - V2 List
     let service = Service::v2_manifests_get(client.clone(), solvers.clone());
 
     let request = manifests_get::Request::new(
@@ -51,10 +51,36 @@ async fn run(base_url: &str) {
         vec![manifests_get::APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_LIST_V2_JSON.to_string()],
     );
 
-    // Act - Manifest Get
+    // Act - Manifest Get - V2 List
     let response = service.call(request).await.expect("failed to send request");
 
-    // Assert - Manifest Get
+    // Assert - Manifest Get - V2 List
+    assert_eq!(response.raw().status(), StatusCode::OK);
+    let authentication = response.authentication().cloned();
+    let response = response.to_spec().await.unwrap();
+    println!("{:?} {:?}", authentication, response);
+    println!("");
+
+    // Arrange - Manifest Get - V2
+    let manifests_get::ResponseBody::V2List(manifest) = response else {
+        panic!("unexpected response type");
+    };
+
+    let service = Service::v2_manifests_get(client.clone(), solvers.clone());
+
+    let request = manifests_get::Request::new(
+        Url::parse(base_url).unwrap(),
+        authentication,
+        Some(credential.clone()),
+        "ubuntu".to_string(),
+        manifest.manifests[0].digest.to_string(),
+        vec![manifests_get::APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_V2_JSON.to_string()],
+    );
+
+    // Act - Manifest Get - V2
+    let response = service.call(request).await.expect("failed to send request");
+
+    // Assert - Manifest Get - V2
     assert_eq!(response.raw().status(), StatusCode::OK);
     let authentication = response.authentication().cloned();
     let response = response.to_spec().await.unwrap();
