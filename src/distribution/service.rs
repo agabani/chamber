@@ -40,6 +40,46 @@ where
     }
 }
 
+impl<Client> Service<Client, super::api::v2::catalog::Request, super::api::v2::catalog::Response>
+where
+    Client: tower::Service<hyper::Request<hyper::Body>, Response = hyper::Response<hyper::Body>>
+        + Clone
+        + 'static,
+    Client::Error: Into<error::Error>,
+{
+    ///
+    pub fn v2_catalog(client: Client, solvers: Vec<Arc<dyn Solver>>) -> Self {
+        Self::new(client, solvers)
+    }
+}
+
+impl<Client> Service<Client, super::api::v2::support::Request, super::api::v2::support::Response>
+where
+    Client: tower::Service<hyper::Request<hyper::Body>, Response = hyper::Response<hyper::Body>>
+        + Clone
+        + 'static,
+    Client::Error: Into<error::Error>,
+{
+    ///
+    pub fn v2_support(client: Client, solvers: Vec<Arc<dyn Solver>>) -> Self {
+        Self::new(client, solvers)
+    }
+}
+
+impl<Client>
+    Service<Client, super::api::v2::tags_list::Request, super::api::v2::tags_list::Response>
+where
+    Client: tower::Service<hyper::Request<hyper::Body>, Response = hyper::Response<hyper::Body>>
+        + Clone
+        + 'static,
+    Client::Error: Into<error::Error>,
+{
+    ///
+    pub fn v2_tags_list(client: Client, solvers: Vec<Arc<dyn Solver>>) -> Self {
+        Self::new(client, solvers)
+    }
+}
+
 impl<Client, Request, Response> crate::Service<Request> for Service<Client, Request, Response>
 where
     Client: tower::Service<hyper::Request<hyper::Body>, Response = hyper::Response<hyper::Body>>

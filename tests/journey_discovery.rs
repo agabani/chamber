@@ -40,8 +40,7 @@ async fn run(base_url: &str) {
     ];
 
     // Arrange - Support
-    let service =
-        Service::<_, support::Request, support::Response>::new(client.clone(), solvers.clone());
+    let service = Service::v2_support(client.clone(), solvers.clone());
 
     let request = support::Request::new(
         Url::parse(base_url).unwrap(),
@@ -60,8 +59,7 @@ async fn run(base_url: &str) {
     println!("");
 
     // Arrange - Catalog
-    let service =
-        Service::<_, catalog::Request, catalog::Response>::new(client.clone(), solvers.clone());
+    let service = Service::v2_catalog(client.clone(), solvers.clone());
 
     let request = catalog::Request::new(
         Url::parse(base_url).unwrap(),
@@ -80,8 +78,7 @@ async fn run(base_url: &str) {
     println!("");
 
     // Arrange - TagsList
-    let service =
-        Service::<_, tags_list::Request, tags_list::Response>::new(client.clone(), solvers.clone());
+    let service = Service::v2_tags_list(client.clone(), solvers.clone());
 
     let request = tags_list::Request::new(
         Url::parse(base_url).unwrap(),
@@ -101,8 +98,7 @@ async fn run(base_url: &str) {
     println!("");
 
     // Arrange - TagsList Not Found
-    let service =
-        Service::<_, tags_list::Request, tags_list::Response>::new(client.clone(), solvers.clone());
+    let service = Service::v2_tags_list(client.clone(), solvers.clone());
 
     let request = tags_list::Request::new(
         Url::parse(base_url).unwrap(),
