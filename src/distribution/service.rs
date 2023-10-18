@@ -2,9 +2,7 @@ use std::{future::Future, marker::PhantomData, pin::Pin, sync::Arc};
 
 use tower::ServiceExt as _;
 
-use crate::distribution::error;
-
-use super::authentication::Solver;
+use super::{authentication::Solver, error};
 
 ///
 pub struct Service<Client, Request, Response>
@@ -48,7 +46,7 @@ where
         + Clone
         + 'static,
     Client::Error: Into<error::Error>,
-    Request: super::Request + 'static, // TODO: find a way to remove static...
+    Request: super::Request + 'static,
     Response: super::Response,
 {
     type Response = Response;
