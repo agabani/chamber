@@ -77,7 +77,7 @@ pub struct ManifestResponseBody {
 
     ///
     #[serde(rename = "config")]
-    pub config: Vec<ManifestResponseBodyConfig>,
+    pub config: ManifestResponseBodyConfig,
 
     ///
     #[serde(rename = "layers")]

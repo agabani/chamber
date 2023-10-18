@@ -27,7 +27,7 @@ pub struct ManifestResponseBody {
 
     ///
     #[serde(rename = "signatures")]
-    pub signatures: Vec<ManifestResponseBodySignature>,
+    pub signatures: Option<Vec<ManifestResponseBodySignature>>,
 }
 
 ///

@@ -48,7 +48,7 @@ async fn run(base_url: &str) {
         Some(credential.clone()),
         "ubuntu".to_string(),
         "v2".to_string(),
-        vec![manifests_get::APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_V2_JSON.to_string()],
+        vec![manifests_get::APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_LIST_V2_JSON.to_string()],
     );
 
     // Act - Manifest Get
@@ -57,8 +57,7 @@ async fn run(base_url: &str) {
     // Assert - Manifest Get
     assert_eq!(response.raw().status(), StatusCode::OK);
     let authentication = response.authentication().cloned();
-    // let response = response.to_spec().await.unwrap();
-    println!("{:?}", authentication);
-    // println!("{:?} {:?}", authentication, response);
+    let response = response.to_spec().await.unwrap();
+    println!("{:?} {:?}", authentication, response);
     println!("");
 }

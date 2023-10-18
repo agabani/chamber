@@ -90,6 +90,7 @@ impl Response {
     pub fn raw(&self) -> &hyper::Response<hyper::Body> {
         &self.http_response
     }
+
     /// # Errors
     ///
     /// Will return `Err` if response body is not deserializable.

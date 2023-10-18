@@ -1,9 +1,11 @@
 use std::{future::Future, pin::Pin};
 
+use hyper::StatusCode;
+
 use crate::distribution::{
     self,
     authentication::{Authentication, Credential},
-    error,
+    error, spec,
     www_authenticate::WwwAuthenticate,
 };
 
@@ -115,6 +117,53 @@ impl Response {
     pub fn raw(&self) -> &hyper::Response<hyper::Body> {
         &self.http_response
     }
+
+    /// # Errors
+    ///
+    /// Will return `Err` if response body is not deserializable.
+    pub async fn to_spec(self) -> Result<ResponseBody, error::Error> {
+        let status_code = self.http_response.status();
+
+        match status_code {
+            StatusCode::OK => (),
+            StatusCode::NOT_FOUND => {
+                let body = self.http_response.into_body();
+                let bytes = hyper::body::to_bytes(body).await?;
+                return Ok(ResponseBody::Error(serde_json::from_slice(&bytes)?));
+            }
+            status_code => todo!("{status_code}"),
+        };
+
+        let Some(content_type) = self.http_response.headers().get("Content-Type") else {
+            return Err(error::Error::Protocol(
+                "response header did not contain Content-Type.".to_string(),
+            ));
+        };
+
+        Ok(match content_type.to_str()? {
+            APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_V1_JSON => {
+                let body = self.http_response.into_body();
+                let bytes = hyper::body::to_bytes(body).await?;
+                ResponseBody::V1(serde_json::from_slice(&bytes)?)
+            }
+            APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_V1_PRETTYJWS => {
+                let body = self.http_response.into_body();
+                let bytes = hyper::body::to_bytes(body).await?;
+                ResponseBody::V1PrettyJWS(serde_json::from_slice(&bytes)?)
+            }
+            APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_V2_JSON => {
+                let body = self.http_response.into_body();
+                let bytes = hyper::body::to_bytes(body).await?;
+                ResponseBody::V2(serde_json::from_slice(&bytes)?)
+            }
+            APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_LIST_V2_JSON => {
+                let body = self.http_response.into_body();
+                let bytes = hyper::body::to_bytes(body).await?;
+                ResponseBody::V2List(serde_json::from_slice(&bytes)?)
+            }
+            content_type => todo!("{content_type}"),
+        })
+    }
 }
 
 impl distribution::Response for Response {
@@ -141,4 +190,19 @@ impl distribution::Response for Response {
         let www_authenticate = WwwAuthenticate::parse(value)?;
         Ok(Some(www_authenticate))
     }
+}
+
+///
+#[derive(Debug)]
+pub enum ResponseBody {
+    ///
+    V1(spec::v2::schema_1::ManifestResponseBody),
+    ///
+    V1PrettyJWS(spec::v2::schema_1::ManifestResponseBody),
+    ///
+    V2(spec::v2::schema_2::ManifestResponseBody),
+    ///
+    V2List(spec::v2::schema_2::ManifestListResponseBody),
+    ///
+    Error(spec::v2::ErrorResponseBody),
 }
