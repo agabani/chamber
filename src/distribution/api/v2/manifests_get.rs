@@ -10,19 +10,19 @@ use crate::distribution::{
 };
 
 /// application/vnd.docker.distribution.manifest.v1+json
-pub const APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_V1_JSON: &'static str =
+pub const APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_V1_JSON: &str =
     "application/vnd.docker.distribution.manifest.v1+json";
 
 /// application/vnd.docker.distribution.manifest.v1+prettyjws
-pub const APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_V1_PRETTYJWS: &'static str =
+pub const APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_V1_PRETTYJWS: &str =
     "application/vnd.docker.distribution.manifest.v1+prettyjws";
 
 /// application/vnd.docker.distribution.manifest.v2+json
-pub const APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_V2_JSON: &'static str =
+pub const APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_V2_JSON: &str =
     "application/vnd.docker.distribution.manifest.v2+json";
 
 /// application/vnd.docker.distribution.manifest.list.v2+json
-pub const APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_LIST_V2_JSON: &'static str =
+pub const APPLICATION_VND_DOCKER_DISTRIBUTION_MANIFEST_LIST_V2_JSON: &str =
     "application/vnd.docker.distribution.manifest.list.v2+json";
 
 ///
