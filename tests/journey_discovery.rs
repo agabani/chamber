@@ -6,7 +6,7 @@ use chamber::{
         authentication::{BasicSolver, BearerSolver, Credential, Solver, UsernamePassword},
         service::Service,
     },
-    service::Service as _,
+    Service as _,
 };
 use hyper::StatusCode;
 use url::Url;

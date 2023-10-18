@@ -42,8 +42,7 @@ where
     }
 }
 
-impl<Client, Request, Response> crate::service::Service<Request>
-    for Service<Client, Request, Response>
+impl<Client, Request, Response> crate::Service<Request> for Service<Client, Request, Response>
 where
     Client: tower::Service<hyper::Request<hyper::Body>, Response = hyper::Response<hyper::Body>>
         + Clone
