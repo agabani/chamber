@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use chamber::{
     distribution::{
-        api::v2::manifests_get,
+        api::v2::{blobs_get, manifests_get},
         authentication::{BasicSolver, BearerSolver, Credential, Solver, UsernamePassword},
         service::Service,
     },
@@ -85,5 +85,29 @@ async fn run(base_url: &str) {
     let authentication = response.authentication().cloned();
     let response = response.to_spec().await.unwrap();
     println!("{:?} {:?}", authentication, response);
+    println!("");
+
+    // Arrange - Blobs Get
+    let manifests_get::ResponseBody::V2(manifest) = response else {
+        panic!("unexpected response type");
+    };
+
+    let service = Service::v2_blobs_get(client.clone(), solvers.clone());
+
+    let request = blobs_get::Request::new(
+        Url::parse(base_url).unwrap(),
+        authentication,
+        Some(credential.clone()),
+        "ubuntu".to_string(),
+        manifest.config.digest,
+    );
+
+    // Act - Blobs Get
+    let response = service.call(request).await.expect("failed to send request");
+
+    // Assert - Blobs Get
+    assert_eq!(response.raw().status(), StatusCode::OK);
+    let authentication = response.authentication().cloned();
+    println!("{:?} {:?}", authentication, response.raw());
     println!("");
 }

@@ -24,6 +24,15 @@ impl<Client, Request, Response> Service<Client, Request, Response> {
     }
 }
 
+impl<Client>
+    Service<Client, super::api::v2::blobs_get::Request, super::api::v2::blobs_get::Response>
+{
+    ///
+    pub fn v2_blobs_get(client: Client, solvers: Vec<Arc<dyn Solver>>) -> Self {
+        Self::new(client, solvers)
+    }
+}
+
 impl<Client> Service<Client, super::api::v2::catalog::Request, super::api::v2::catalog::Response> {
     ///
     pub fn v2_catalog(client: Client, solvers: Vec<Arc<dyn Solver>>) -> Self {

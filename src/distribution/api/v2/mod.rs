@@ -1,4 +1,6 @@
 ///
+pub mod blobs_get;
+///
 pub mod catalog;
 ///
 pub mod manifests_get;
