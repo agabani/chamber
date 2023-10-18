@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use chamber::{
     distribution::{
-        api::v2::{SupportRequest, SupportResponse},
+        api::v2::{CatalogRequest, CatalogResponse, SupportRequest, SupportResponse},
         authentication::{BasicSolver, BearerSolver, Credential, Solver, UsernamePassword},
         service::Service,
     },
@@ -27,7 +27,7 @@ async fn distribution_bearer() {
 }
 
 async fn run(base_url: &str) {
-    // Arrange
+    // Setup
     let credential = Credential::UsernamePassword(UsernamePassword {
         username: "admin".to_string(),
         password: "password".to_string(),
@@ -38,15 +38,35 @@ async fn run(base_url: &str) {
         Arc::new(BearerSolver::new(client.clone())),
     ];
 
-    let service = Service::<_, SupportRequest, SupportResponse>::new(client.clone(), solvers);
+    // Arrange
+    let service =
+        Service::<_, SupportRequest, SupportResponse>::new(client.clone(), solvers.clone());
 
-    // Act
     let request = SupportRequest::new(
         Url::parse(base_url).unwrap(),
         None,
         Some(credential.clone()),
     );
 
+    // Act
+    let response = service.call(request).await.expect("failed to send request");
+
+    // Assert
+    println!("{:?} {:?}", response.authentication(), response.raw());
+
+    assert_eq!(response.raw().status(), StatusCode::OK);
+
+    // Arrange
+    let service =
+        Service::<_, CatalogRequest, CatalogResponse>::new(client.clone(), solvers.clone());
+
+    let request = CatalogRequest::new(
+        Url::parse(base_url).unwrap(),
+        None,
+        Some(credential.clone()),
+    );
+
+    // Act
     let response = service.call(request).await.expect("failed to send request");
 
     // Assert
