@@ -2,7 +2,10 @@ use std::sync::Arc;
 
 use chamber::{
     distribution::{
-        api::v2::{CatalogRequest, CatalogResponse, SupportRequest, SupportResponse},
+        api::v2::{
+            CatalogRequest, CatalogResponse, SupportRequest, SupportResponse, TagsListRequest,
+            TagsListResponse,
+        },
         authentication::{BasicSolver, BearerSolver, Credential, Solver, UsernamePassword},
         service::Service,
     },
@@ -28,6 +31,7 @@ async fn distribution_bearer() {
 
 async fn run(base_url: &str) {
     // Setup
+    let authentication = None;
     let credential = Credential::UsernamePassword(UsernamePassword {
         username: "admin".to_string(),
         password: "password".to_string(),
@@ -44,7 +48,7 @@ async fn run(base_url: &str) {
 
     let request = SupportRequest::new(
         Url::parse(base_url).unwrap(),
-        None,
+        authentication,
         Some(credential.clone()),
     );
 
@@ -52,9 +56,10 @@ async fn run(base_url: &str) {
     let response = service.call(request).await.expect("failed to send request");
 
     // Assert
-    println!("{:?} {:?}", response.authentication(), response.raw());
-
     assert_eq!(response.raw().status(), StatusCode::OK);
+    let authentication = response.authentication().cloned();
+    println!("{:?} {:?}", authentication, response.raw());
+    println!("");
 
     // Arrange
     let service =
@@ -62,7 +67,7 @@ async fn run(base_url: &str) {
 
     let request = CatalogRequest::new(
         Url::parse(base_url).unwrap(),
-        None,
+        authentication,
         Some(credential.clone()),
     );
 
@@ -71,6 +76,29 @@ async fn run(base_url: &str) {
 
     // Assert
     assert_eq!(response.raw().status(), StatusCode::OK);
+    let authentication = response.authentication().cloned();
     let response = response.to_json().await.unwrap();
-    println!("{:?}", response);
+    println!("{:?} {:?}", authentication, response);
+    println!("");
+
+    // Arrange
+    let service =
+        Service::<_, TagsListRequest, TagsListResponse>::new(client.clone(), solvers.clone());
+
+    let request = TagsListRequest::new(
+        Url::parse(base_url).unwrap(),
+        response.repositories.first().unwrap().clone(),
+        authentication,
+        Some(credential.clone()),
+    );
+
+    // Act
+    let response = service.call(request).await.expect("failed to send request");
+
+    // Assert
+    assert_eq!(response.raw().status(), StatusCode::OK);
+    let authentication = response.authentication().cloned();
+    let response = response.to_json().await.unwrap();
+    println!("{:?} {:?}", authentication, response);
+    println!("");
 }
