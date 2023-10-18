@@ -18,7 +18,7 @@ pub trait Request {
     fn credential(&self) -> Option<&Credential>;
 
     ///
-    fn to_http_request(&self) -> Self::Future;
+    fn to_http_request(&self, authentication: Option<&Authentication>) -> Self::Future;
 }
 
 ///
@@ -97,7 +97,7 @@ where
         let solvers = self.solvers.clone();
 
         let future = async move {
-            let http_request = request.to_http_request().await?;
+            let http_request = request.to_http_request(None).await?;
 
             let http_response = client
                 .ready()
@@ -120,7 +120,7 @@ where
             for challenge in www_authenticate.challenges {
                 for solver in &solvers {
                     if let Some(authentication) = solver.solve(&challenge, credential).await? {
-                        let http_request = request.to_http_request().await?;
+                        let http_request = request.to_http_request(Some(&authentication)).await?;
 
                         let http_response = client
                             .ready()

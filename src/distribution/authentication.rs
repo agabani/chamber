@@ -1,5 +1,7 @@
 use std::{future::Future, pin::Pin};
 
+use base64::Engine;
+
 use crate::{distribution::error, parser::www_authenticate::Challenge};
 
 ///
@@ -22,12 +24,14 @@ pub struct Bearer {
 }
 
 ///
+#[derive(Debug, Clone)]
 pub enum Credential {
     ///
     UsernamePassword(UsernamePassword),
 }
 
 ///
+#[derive(Debug, Clone)]
 pub struct UsernamePassword {
     ///
     pub username: String,
@@ -52,12 +56,23 @@ pub struct BasicSolver;
 impl Solver for BasicSolver {
     fn solve(
         &self,
-        _challenge: &Challenge,
-        _credential: &Credential,
+        challenge: &Challenge,
+        credential: &Credential,
     ) -> Pin<Box<dyn Future<Output = Result<Option<Authentication>, error::Error>>>> {
-        let future = async move { Ok(None) };
+        if challenge.auth_scheme != "Basic" {
+            return Box::pin(async move { Ok(None) });
+        }
 
-        Box::pin(future)
+        let authentication = match credential {
+            Credential::UsernamePassword(credential) => {
+                let engine = base64::engine::general_purpose::STANDARD;
+                let encoded =
+                    engine.encode(format!("{}:{}", credential.username, credential.password));
+                Authentication::Basic(encoded)
+            }
+        };
+
+        Box::pin(async move { Ok(Some(authentication)) })
     }
 }
 

@@ -13,14 +13,21 @@ use crate::{
 pub struct SupportRequest {
     authentication: Option<Authentication>,
     base_url: url::Url,
+    credential: Option<Credential>,
 }
 
 impl SupportRequest {
     ///
-    pub fn new(base_url: url::Url, authentication: Option<Authentication>) -> Self {
+    #[must_use]
+    pub fn new(
+        base_url: url::Url,
+        authentication: Option<Authentication>,
+        credential: Option<Credential>,
+    ) -> Self {
         Self {
             authentication,
             base_url,
+            credential,
         }
     }
 }
@@ -33,19 +40,29 @@ impl Request for SupportRequest {
     }
 
     fn credential(&self) -> Option<&Credential> {
-        todo!()
+        self.credential.as_ref()
     }
 
-    fn to_http_request(&self) -> Self::Future {
+    fn to_http_request(&self, authentication: Option<&Authentication>) -> Self::Future {
         let mut base_url = self.base_url.clone();
         base_url.set_path("/v2/");
 
         let uri = base_url.to_string();
 
-        let result = hyper::Request::builder()
+        let mut request = hyper::Request::builder()
             .method(hyper::Method::GET)
-            .uri(uri)
-            .body(hyper::body::Body::empty());
+            .uri(uri);
+
+        if let Some(authentication) = authentication.or(self.authentication.as_ref()) {
+            match authentication {
+                Authentication::Basic(token) => {
+                    request = request.header("Authorization", format!("Basic {token}"));
+                }
+                Authentication::Bearer(_) => todo!(),
+            }
+        }
+
+        let result = request.body(hyper::body::Body::empty());
 
         Box::pin(async move { result.map_err(Into::into) })
     }
