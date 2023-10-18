@@ -1,3 +1,8 @@
+///
+pub mod schema_1;
+///
+pub mod schema_2;
+
 use std::collections::HashMap;
 
 ///
