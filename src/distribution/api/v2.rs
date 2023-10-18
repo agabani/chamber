@@ -5,6 +5,7 @@ use crate::{
         authentication::{Authentication, Credential},
         error,
         service::{Request, Response},
+        spec,
     },
     parser::www_authenticate::WwwAuthenticate,
 };
@@ -148,6 +149,14 @@ impl CatalogResponse {
     ///
     pub fn raw(&self) -> &hyper::Response<hyper::Body> {
         &self.http_response
+    }
+
+    ///
+    pub async fn to_json(self) -> Result<spec::v2::CatalogResponseBody, error::Error> {
+        let body = self.http_response.into_body();
+        let bytes = hyper::body::to_bytes(body).await?;
+        let response = serde_json::from_slice(&bytes)?;
+        Ok(response)
     }
 }
 

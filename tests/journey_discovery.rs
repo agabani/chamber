@@ -70,7 +70,7 @@ async fn run(base_url: &str) {
     let response = service.call(request).await.expect("failed to send request");
 
     // Assert
-    println!("{:?} {:?}", response.authentication(), response.raw());
-
     assert_eq!(response.raw().status(), StatusCode::OK);
+    let response = response.to_json().await.unwrap();
+    println!("{:?}", response);
 }
