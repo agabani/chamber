@@ -8,6 +8,7 @@ use chamber::{
     },
     service::Service as _,
 };
+use url::Url;
 
 #[tokio::test]
 async fn distribution() {
@@ -35,7 +36,9 @@ async fn run(base_url: &str) {
     let service = Service::<_, SupportRequest, SupportResponse>::new(client.clone(), solvers);
 
     // Act
-    let request = SupportRequest;
+    let request = SupportRequest::new(Url::parse(base_url).unwrap(), None);
 
     let response = service.call(request).await.expect("failed to send request");
+
+    println!("{:?} {:?}", response.authentication(), response.raw());
 }

@@ -3,7 +3,7 @@ use std::{future::Future, pin::Pin};
 use crate::{distribution::error, parser::www_authenticate::Challenge};
 
 ///
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum Authentication {
     ///
     Basic(String),
@@ -12,7 +12,7 @@ pub enum Authentication {
 }
 
 ///
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Bearer {
     ///
     pub access_token: String,
