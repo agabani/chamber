@@ -9,23 +9,11 @@ use crate::distribution::{error, www_authenticate::Challenge};
 use super::{Authentication, Bearer, Credential, Solver};
 
 ///
-pub struct BearerSolver<S>
-where
-    S: tower::Service<hyper::Request<hyper::Body>, Response = hyper::Response<hyper::Body>>
-        + Clone
-        + 'static,
-    S::Error: Into<error::Error>,
-{
+pub struct BearerSolver<S> {
     client: S,
 }
 
-impl<S> BearerSolver<S>
-where
-    S: tower::Service<hyper::Request<hyper::Body>, Response = hyper::Response<hyper::Body>>
-        + Clone
-        + 'static,
-    S::Error: Into<error::Error>,
-{
+impl<S> BearerSolver<S> {
     ///
     #[must_use]
     pub fn new(client: S) -> Self {
