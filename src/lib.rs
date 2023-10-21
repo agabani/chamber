@@ -7,6 +7,8 @@
 pub mod distribution;
 ///
 pub mod storage;
+///
+pub mod workflow;
 
 use std::future::Future;
 

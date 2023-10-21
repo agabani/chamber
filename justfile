@@ -18,6 +18,13 @@ container-registry-seed-copy:
   @docker run --rm --net host -v ./skopeo:/tmp quay.io/skopeo/stable:latest copy docker://ubuntu:latest docker://localhost:5002/ubuntu:oci --dest-tls-verify=false --format=oci --multi-arch all --dest-creds admin:password
   @docker run --rm --net host -v ./skopeo:/tmp quay.io/skopeo/stable:latest copy docker://ubuntu:latest docker://localhost:5002/ubuntu:v2 --dest-tls-verify=false --format=v2s2 --multi-arch all --dest-creds admin:password
 
+  @docker run --rm --net host -v ./skopeo:/tmp quay.io/skopeo/stable:latest copy docker://rust:latest docker://localhost:5000/rust:oci --dest-tls-verify=false --format=oci --multi-arch all
+  @docker run --rm --net host -v ./skopeo:/tmp quay.io/skopeo/stable:latest copy docker://rust:latest docker://localhost:5000/rust:v2 --dest-tls-verify=false --format=v2s2 --multi-arch all
+  @docker run --rm --net host -v ./skopeo:/tmp quay.io/skopeo/stable:latest copy docker://rust:latest docker://localhost:5001/rust:oci --dest-tls-verify=false --format=oci --multi-arch all --dest-creds admin:password
+  @docker run --rm --net host -v ./skopeo:/tmp quay.io/skopeo/stable:latest copy docker://rust:latest docker://localhost:5001/rust:v2 --dest-tls-verify=false --format=v2s2 --multi-arch all --dest-creds admin:password
+  @docker run --rm --net host -v ./skopeo:/tmp quay.io/skopeo/stable:latest copy docker://rust:latest docker://localhost:5002/rust:oci --dest-tls-verify=false --format=oci --multi-arch all --dest-creds admin:password
+  @docker run --rm --net host -v ./skopeo:/tmp quay.io/skopeo/stable:latest copy docker://rust:latest docker://localhost:5002/rust:v2 --dest-tls-verify=false --format=v2s2 --multi-arch all --dest-creds admin:password
+
 # container registry seed login
 container-registry-seed-login:
   @docker run --rm --net host -v ./skopeo:/tmp -it quay.io/skopeo/stable:latest login docker.io
