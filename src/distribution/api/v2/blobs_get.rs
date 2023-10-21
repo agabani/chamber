@@ -91,6 +91,11 @@ impl Response {
     pub fn raw(&self) -> &hyper::Response<hyper::Body> {
         &self.http_response
     }
+
+    ///
+    pub fn into_body(self) -> hyper::Body {
+        self.http_response.into_body()
+    }
 }
 
 impl distribution::Response for Response {

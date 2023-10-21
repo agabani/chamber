@@ -5,10 +5,12 @@ use chamber::{
         api::v2::{blobs_get, manifests_get},
         authentication::{BasicSolver, BearerSolver, Credential, Solver, UsernamePassword},
         service::Service,
+        streaming::stream,
     },
     Service as _,
 };
 use hyper::StatusCode;
+use tokio::io::BufWriter;
 use url::Url;
 
 #[tokio::test]
@@ -94,20 +96,69 @@ async fn run(base_url: &str) {
 
     let service = Service::v2_blobs_get(client.clone(), solvers.clone());
 
+    // Arrange - Blobs Get - Config
     let request = blobs_get::Request::new(
         Url::parse(base_url).unwrap(),
         authentication,
         Some(credential.clone()),
         "ubuntu".to_string(),
-        manifest.config.digest,
+        manifest.config.digest.to_string(),
     );
 
-    // Act - Blobs Get
+    // Act - Blobs Get - Config
     let response = service.call(request).await.expect("failed to send request");
 
-    // Assert - Blobs Get
+    // Assert - Blobs Get - Config
     assert_eq!(response.raw().status(), StatusCode::OK);
     let authentication = response.authentication().cloned();
     println!("{:?} {:?}", authentication, response.raw());
     println!("");
+
+    // ???
+    let body = response.into_body();
+    tokio::fs::create_dir_all(format!(
+        "./tmp/{}/blobs/{}",
+        "ubuntu", manifest.config.digest
+    ))
+    .await
+    .unwrap();
+    let file = tokio::fs::File::create(format!(
+        "./tmp/{}/blobs/{}/blob",
+        "ubuntu", manifest.config.digest
+    ))
+    .await
+    .unwrap();
+    let mut file = BufWriter::new(file);
+
+    stream(body, &mut file).await.unwrap();
+
+    // Arrange - Blobs Get - Layers
+    let request = blobs_get::Request::new(
+        Url::parse(base_url).unwrap(),
+        authentication,
+        Some(credential.clone()),
+        "ubuntu".to_string(),
+        manifest.layers[0].digest.to_string(),
+    );
+
+    // Act - Blobs Get - Layers
+    let response = service.call(request).await.expect("failed to send request");
+
+    // Assert - Blobs Get - Layers
+    assert_eq!(response.raw().status(), StatusCode::OK);
+    let authentication = response.authentication().cloned();
+    println!("{:?} {:?}", authentication, response.raw());
+    println!("");
+
+    // ???
+    let body = response.into_body();
+    let file = tokio::fs::File::create(format!(
+        "./tmp/{}/blobs/{}",
+        "ubuntu", manifest.layers[0].digest
+    ))
+    .await
+    .unwrap();
+    let mut file = BufWriter::new(file);
+
+    stream(body, &mut file).await.unwrap();
 }

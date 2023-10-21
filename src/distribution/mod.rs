@@ -9,6 +9,8 @@ pub mod service;
 ///
 pub mod spec;
 ///
+pub mod streaming;
+///
 pub mod www_authenticate;
 
 use std::future::Future;
