@@ -7,10 +7,10 @@ use chamber::{
         service::Service,
         streaming::stream,
     },
+    storage::cache::Cache,
     Service as _,
 };
 use hyper::StatusCode;
-use tokio::io::BufWriter;
 use url::Url;
 
 #[tokio::test]
@@ -31,6 +31,7 @@ async fn distribution_bearer() {
 async fn run(base_url: &str) {
     // Setup
     let authentication = None;
+    let cache = Cache::new("./tmp");
     let credential = Credential::UsernamePassword(UsernamePassword {
         username: "admin".to_string(),
         password: "password".to_string(),
@@ -116,20 +117,11 @@ async fn run(base_url: &str) {
 
     // ???
     let body = response.into_body();
-    tokio::fs::create_dir_all(format!(
-        "./tmp/{}/blobs/{}",
-        "ubuntu", manifest.config.digest
-    ))
-    .await
-    .unwrap();
-    let file = tokio::fs::File::create(format!(
-        "./tmp/{}/blobs/{}/blob",
-        "ubuntu", manifest.config.digest
-    ))
-    .await
-    .unwrap();
-    let mut file = BufWriter::new(file);
-
+    let mut file = cache
+        .blob("ubuntu", &manifest.config.digest)
+        .writer()
+        .await
+        .unwrap();
     stream(body, &mut file).await.unwrap();
 
     // Arrange - Blobs Get - Layers
@@ -152,13 +144,10 @@ async fn run(base_url: &str) {
 
     // ???
     let body = response.into_body();
-    let file = tokio::fs::File::create(format!(
-        "./tmp/{}/blobs/{}",
-        "ubuntu", manifest.layers[0].digest
-    ))
-    .await
-    .unwrap();
-    let mut file = BufWriter::new(file);
-
+    let mut file = cache
+        .blob("ubuntu", &manifest.layers[0].digest)
+        .writer()
+        .await
+        .unwrap();
     stream(body, &mut file).await.unwrap();
 }
